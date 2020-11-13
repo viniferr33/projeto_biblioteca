@@ -35,10 +35,12 @@ typedef struct aluno
 
 void pause();
 void flush();
+
 void aloca_aluno(aluno **p, int qtd);
 void mostra_alunos(aluno *p, int qtd);
 void cadastra_aluno(aluno *p, int qtd);
 void consulta_total(aluno *p, int qtd);
+void consulta_parcial(aluno *p, int qtd);
 
 int main(int argc, char const *argv[])
 {
@@ -66,6 +68,7 @@ int main(int argc, char const *argv[])
             break;
 
         case 3:
+            consulta_parcial(alunos, qtd_a);
             break;
 
         default:
@@ -165,6 +168,68 @@ void consulta_total(aluno *p, int qtd)
         if(regis > 0) printf("\n\t- Reg: \033[0;36m%i\033[0;0m", regis);
         printf("\n\n");
     }
+    pause();
+}
+
+void consulta_parcial(aluno *p, int qtd)
+{
+    system(clear);
+    printf("\nDigite o RA do aluno:\t");
+    int aux_ra = 0;
+    char RA[7];
+    do
+    {
+        flush();
+        scanf("%s", RA);
+        flush();
+
+        if (strlen(RA) == 6)
+        {
+            int j;
+            for (j = 0; j < 6; j++)
+            {
+                if (isdigit(*(RA + j)) == 0)
+                {
+                    printf("\nO RA deve ser composto por digitos numericos!\nDigite o RA do aluno: ");
+                    aux_ra = 0;
+                    break;
+                }
+                else
+                    aux_ra = 1;
+            }
+        }
+
+        else
+        {
+            printf("\nO RA deve conter 6 digitos!\nDigite o RA do aluno: ");
+        }
+
+    } while (aux_ra == 0);
+
+    int i; int flag = 0;
+    for(i = 0; i < qtd; i++)
+    {
+        if(strcmp((p+i)->RA, RA) == 0)
+        {
+            printf("Nome:\t\033[0;36m%s\033[0;0m\t", (p+i)->nome);
+            printf("RA: \t\033[0;36m%s\033[0;0m\n", (p+i)->RA);
+            printf("Livros emprestados: \t\033[0;36m%i\033[0;0m", (p+i)->emprestado);
+            
+            int j; int regis = -1;
+            for(j = 0; j < 4; j++)
+            {
+                if((p+i)->tabela[j].sigla == 'E') printf("\n\t- Reg: \033[0;36m%i\033[0;0m", (p+i)->tabela[j].reg);
+                else if((p+i)->tabela[j].sigla == 'R') regis = (p+i)->tabela[j].reg;
+            }
+
+            printf("\nLivros reservados: \t\033[0;36m%i\033[0;0m", (p+i)->reservado);
+            if(regis > 0) printf("\n\t- Reg: \033[0;36m%i\033[0;0m", regis);
+            printf("\n\n");
+            flag = 1;
+            break; 
+        }
+    }
+    if(flag == 0) printf("\nO aluno referente a esse RA não existe!");
     pause();
 }
 
