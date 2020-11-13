@@ -38,12 +38,42 @@ void flush();
 void aloca_aluno(aluno **p, int qtd);
 void mostra_alunos(aluno *p, int qtd);
 void cadastra_aluno(aluno *p, int qtd);
+void consulta_total(aluno *p, int qtd);
 
 int main(int argc, char const *argv[])
 {
     aluno *alunos = NULL;
-    aloca_aluno(&alunos, 1);
-    cadastra_aluno(alunos, 1);
+    int opt = -1;
+    int qtd_a = 0;
+
+    do
+    {
+        system(clear);
+        printf("0 - Sair\n1 - Adicionar\n2 - Pesquisa total\n3 - Pesquisa Parcial\n");
+        scanf("%i", &opt);
+        flush();
+
+        switch (opt)
+        {
+        case 1:
+            aloca_aluno(&alunos, qtd_a + 1);
+            cadastra_aluno(alunos, qtd_a);
+            qtd_a++;
+            break;
+        
+        case 2:
+            consulta_total(alunos, qtd_a);
+            break;
+
+        case 3:
+            break;
+
+        default:
+            break;
+        }
+
+    } while (opt != 0);
+    
     return 0;
 } //MAIN
 
@@ -63,24 +93,24 @@ void cadastra_aluno(aluno *p, int qtd)
     printf("### Cadastro de alunos ###\n\n");
 
     printf("Digite o nome do aluno:\t");
-    fgets(p->nome, 79, stdin);
+    fgets((p+qtd)->nome, 79, stdin);
     flush();
-    *(p->nome + strlen(p->nome) - 1) = '\0';
+    *((p+qtd)->nome + strlen((p+qtd)->nome) - 1) = '\0';
 
     printf("\nDigite o RA do aluno:\t");
     int aux_ra = 0;
     do
     {
         flush();
-        scanf("%s", p->RA);
+        scanf("%s", (p+qtd)->RA);
         flush();
 
-        if (strlen(p->RA) == 6)
+        if (strlen((p+qtd)->RA) == 6)
         {
             int j;
             for (j = 0; j < 6; j++)
             {
-                if (isdigit(*(p->RA + j)) == 0)
+                if (isdigit(*((p+qtd)->RA + j)) == 0)
                 {
                     printf("\nO RA deve ser composto por digitos numericos!\nDigite o RA do aluno: ");
                     aux_ra = 0;
@@ -98,19 +128,43 @@ void cadastra_aluno(aluno *p, int qtd)
 
     } while (aux_ra == 0);
 
-    p->emprestado = 0;
-    p->reservado = 0;
+    (p+qtd)->emprestado = 0;
+    (p+qtd)->reservado = 0;
 
     int i;
     for (i = 0; i < 4; i++)
     {
-        p->tabela[i].sigla = 'L';
+        (p+qtd)->tabela[i].sigla = 'L';
     }
     system(clear);
     printf("\033[0;32m### Cadastro Realizado com sucesso!! ###\033[0m\n");
-    printf("Nome:\t\033[0;36m%s\033[0;0m\t", p->nome);
-    printf("RA: \t\033[0;36m%s\033[0;0m\n", p->RA);
+    printf("Nome:\t\033[0;36m%s\033[0;0m\t", (p+qtd)->nome);
+    printf("RA: \t\033[0;36m%s\033[0;0m\n", (p+qtd)->RA);
 
+    pause();
+}
+
+void consulta_total(aluno *p, int qtd)
+{
+    system(clear);
+    int i;
+    for(i = 0; i < qtd; i++)
+    {
+        printf("Nome:\t\033[0;36m%s\033[0;0m\t", (p+i)->nome);
+        printf("RA: \t\033[0;36m%s\033[0;0m\n", (p+i)->RA);
+        printf("Livros emprestados: \t\033[0;36m%i\033[0;0m", (p+i)->emprestado);
+        
+        int j; int regis = -1;
+        for(j = 0; j < 4; j++)
+        {
+            if((p+i)->tabela[j].sigla == 'E') printf("\n\t- Reg: \033[0;36m%i\033[0;0m", (p+i)->tabela[j].reg);
+            else if((p+i)->tabela[j].sigla == 'R') regis = (p+i)->tabela[j].reg;
+        }
+
+        printf("\nLivros reservados: \t\033[0;36m%i\033[0;0m", (p+i)->reservado);
+        if(regis > 0) printf("\n\t- Reg: \033[0;36m%i\033[0;0m", regis);
+        printf("\n\n");
+    }
     pause();
 }
 
