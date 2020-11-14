@@ -33,20 +33,31 @@ typedef struct aluno
     struct info_livro tabela[4];
 } aluno;
 
+/*
+Funções genericas do algoritmo
+*/
+
 void pause();
 void flush();
+
+/*
+Funções relacionadas a manipulação da struct "Aluno"
+*/
 
 void aloca_aluno(aluno **p, int qtd);
 void mostra_alunos(aluno *p, int qtd);
 void cadastra_aluno(aluno *p, int qtd);
 void consulta_total(aluno *p, int qtd);
 void consulta_parcial(aluno *p, int qtd);
+int quantia_aluno(aluno **p);
+void grava_aluno(aluno *p, int qtd);
 
+// ## MAIN ##
 int main(int argc, char const *argv[])
 {
     aluno *alunos = NULL;
     int opt = -1;
-    int qtd_a = 0;
+    int qtd_a = quantia_aluno(&alunos);
 
     do
     {
@@ -62,7 +73,7 @@ int main(int argc, char const *argv[])
             cadastra_aluno(alunos, qtd_a);
             qtd_a++;
             break;
-        
+
         case 2:
             consulta_total(alunos, qtd_a);
             break;
@@ -76,10 +87,12 @@ int main(int argc, char const *argv[])
         }
 
     } while (opt != 0);
-    
+
+    grava_aluno(alunos, qtd_a);
     return 0;
 } //MAIN
 
+// ## Aloca Aluno ##
 void aloca_aluno(aluno **p, int qtd)
 {
     if ((*p = (aluno *)realloc(*p, qtd * sizeof(aluno))) == NULL)
@@ -90,30 +103,31 @@ void aloca_aluno(aluno **p, int qtd)
     }
 }
 
+// ## Cadastra Aluno ##
 void cadastra_aluno(aluno *p, int qtd)
 {
     system(clear);
     printf("### Cadastro de alunos ###\n\n");
 
     printf("Digite o nome do aluno:\t");
-    fgets((p+qtd)->nome, 79, stdin);
+    fgets((p + qtd)->nome, 79, stdin);
     flush();
-    *((p+qtd)->nome + strlen((p+qtd)->nome) - 1) = '\0';
+    *((p + qtd)->nome + strlen((p + qtd)->nome) - 1) = '\0';
 
     printf("\nDigite o RA do aluno:\t");
     int aux_ra = 0;
     do
     {
         flush();
-        scanf("%s", (p+qtd)->RA);
+        scanf("%s", (p + qtd)->RA);
         flush();
 
-        if (strlen((p+qtd)->RA) == 6)
+        if (strlen((p + qtd)->RA) == 6)
         {
             int j;
             for (j = 0; j < 6; j++)
             {
-                if (isdigit(*((p+qtd)->RA + j)) == 0)
+                if (isdigit(*((p + qtd)->RA + j)) == 0)
                 {
                     printf("\nO RA deve ser composto por digitos numericos!\nDigite o RA do aluno: ");
                     aux_ra = 0;
@@ -131,46 +145,52 @@ void cadastra_aluno(aluno *p, int qtd)
 
     } while (aux_ra == 0);
 
-    (p+qtd)->emprestado = 0;
-    (p+qtd)->reservado = 0;
+    (p + qtd)->emprestado = 0;
+    (p + qtd)->reservado = 0;
 
     int i;
     for (i = 0; i < 4; i++)
     {
-        (p+qtd)->tabela[i].sigla = 'L';
+        (p + qtd)->tabela[i].sigla = 'L';
     }
     system(clear);
     printf("\033[0;32m### Cadastro Realizado com sucesso!! ###\033[0m\n");
-    printf("Nome:\t\033[0;36m%s\033[0;0m\t", (p+qtd)->nome);
-    printf("RA: \t\033[0;36m%s\033[0;0m\n", (p+qtd)->RA);
+    printf("Nome:\t\033[0;36m%s\033[0;0m\t", (p + qtd)->nome);
+    printf("RA: \t\033[0;36m%s\033[0;0m\n", (p + qtd)->RA);
 
     pause();
 }
 
+// ## Consulta Total##
 void consulta_total(aluno *p, int qtd)
 {
     system(clear);
     int i;
-    for(i = 0; i < qtd; i++)
+    for (i = 0; i < qtd; i++)
     {
-        printf("Nome:\t\033[0;36m%s\033[0;0m\t", (p+i)->nome);
-        printf("RA: \t\033[0;36m%s\033[0;0m\n", (p+i)->RA);
-        printf("Livros emprestados: \t\033[0;36m%i\033[0;0m", (p+i)->emprestado);
-        
-        int j; int regis = -1;
-        for(j = 0; j < 4; j++)
+        printf("Nome:\t\033[0;36m%s\033[0;0m\t", (p + i)->nome);
+        printf("RA: \t\033[0;36m%s\033[0;0m\n", (p + i)->RA);
+        printf("Livros emprestados: \t\033[0;36m%i\033[0;0m", (p + i)->emprestado);
+
+        int j;
+        int regis = -1;
+        for (j = 0; j < 4; j++)
         {
-            if((p+i)->tabela[j].sigla == 'E') printf("\n\t- Reg: \033[0;36m%i\033[0;0m", (p+i)->tabela[j].reg);
-            else if((p+i)->tabela[j].sigla == 'R') regis = (p+i)->tabela[j].reg;
+            if ((p + i)->tabela[j].sigla == 'E')
+                printf("\n\t- Reg: \033[0;36m%i\033[0;0m", (p + i)->tabela[j].reg);
+            else if ((p + i)->tabela[j].sigla == 'R')
+                regis = (p + i)->tabela[j].reg;
         }
 
-        printf("\nLivros reservados: \t\033[0;36m%i\033[0;0m", (p+i)->reservado);
-        if(regis > 0) printf("\n\t- Reg: \033[0;36m%i\033[0;0m", regis);
+        printf("\nLivros reservados: \t\033[0;36m%i\033[0;0m", (p + i)->reservado);
+        if (regis > 0)
+            printf("\n\t- Reg: \033[0;36m%i\033[0;0m", regis);
         printf("\n\n");
     }
     pause();
 }
 
+// ## Consulta Parcial ##
 void consulta_parcial(aluno *p, int qtd)
 {
     system(clear);
@@ -206,34 +226,84 @@ void consulta_parcial(aluno *p, int qtd)
 
     } while (aux_ra == 0);
 
-    int i; int flag = 0;
-    for(i = 0; i < qtd; i++)
+    int i;
+    int flag = 0;
+    for (i = 0; i < qtd; i++)
     {
-        if(strcmp((p+i)->RA, RA) == 0)
+        if (strcmp((p + i)->RA, RA) == 0)
         {
-            printf("Nome:\t\033[0;36m%s\033[0;0m\t", (p+i)->nome);
-            printf("RA: \t\033[0;36m%s\033[0;0m\n", (p+i)->RA);
-            printf("Livros emprestados: \t\033[0;36m%i\033[0;0m", (p+i)->emprestado);
-            
-            int j; int regis = -1;
-            for(j = 0; j < 4; j++)
+            printf("Nome:\t\033[0;36m%s\033[0;0m\t", (p + i)->nome);
+            printf("RA: \t\033[0;36m%s\033[0;0m\n", (p + i)->RA);
+            printf("Livros emprestados: \t\033[0;36m%i\033[0;0m", (p + i)->emprestado);
+
+            int j;
+            int regis = -1;
+            for (j = 0; j < 4; j++)
             {
-                if((p+i)->tabela[j].sigla == 'E') printf("\n\t- Reg: \033[0;36m%i\033[0;0m", (p+i)->tabela[j].reg);
-                else if((p+i)->tabela[j].sigla == 'R') regis = (p+i)->tabela[j].reg;
+                if ((p + i)->tabela[j].sigla == 'E')
+                    printf("\n\t- Reg: \033[0;36m%i\033[0;0m", (p + i)->tabela[j].reg);
+                else if ((p + i)->tabela[j].sigla == 'R')
+                    regis = (p + i)->tabela[j].reg;
             }
 
-            printf("\nLivros reservados: \t\033[0;36m%i\033[0;0m", (p+i)->reservado);
-            if(regis > 0) printf("\n\t- Reg: \033[0;36m%i\033[0;0m", regis);
+            printf("\nLivros reservados: \t\033[0;36m%i\033[0;0m", (p + i)->reservado);
+            if (regis > 0)
+                printf("\n\t- Reg: \033[0;36m%i\033[0;0m", regis);
             printf("\n\n");
             flag = 1;
-            break; 
+            break;
         }
     }
-    if(flag == 0) printf("\nO aluno referente a esse RA não existe!");
+    if (flag == 0)
+        printf("\nO aluno referente a esse RA não existe!");
     pause();
 }
 
-// Esta função serve para limpar o buffer em ambos os sistemas operacionais
+// ## Quantia Alunos ##
+int quantia_aluno(aluno **p)
+{
+    FILE *arq = NULL; // Ponteiro para arquivo
+    int qtd;
+    if ((arq = fopen("aluno.bin", "rb")) == NULL) // Testa se o arquivo existe
+    {
+        printf("Não ha registros anteriores!");
+        pause();
+        return 0;
+    }
+    else
+    {
+        fseek(arq, 0, 2);                 // Movimenta o ponteiro dentro do arquivo
+        qtd = ftell(arq) / sizeof(aluno); // Retorna o tamanho do arquivo até o ponteiro
+        aloca_aluno(p, qtd);
+        rewind(arq);                        // Retorna o ponteiro do arquivo para a pos 0
+        fread(*p, sizeof(aluno), qtd, arq); // Lê o arquivo e o salva em p
+        fclose(arq);
+        return qtd;
+    }
+}
+
+// ## Grava aluno ##
+void grava_aluno(aluno *p, int qtd)
+{
+    FILE *fl = NULL;
+    if((fl = fopen("aluno.bin", "wb")) == NULL)
+    {
+        printf("\033[0;31mErro de gravacao!\033[0m");
+        pause();
+    }
+    else
+    {
+        fwrite(p, sizeof(aluno), qtd, fl);
+        printf("\033[0;32mSalvo com sucesso!\033[0m\n");
+        pause();
+    }
+        
+}
+
+/*
+Flush - Função generica
+ - Limpa o buffer de entrada principal (stdin).
+*/
 void flush()
 {
 // ## Esse trecho de código é executado durante a compilação ##
@@ -246,6 +316,10 @@ void flush()
 #endif
 }
 
+/*
+Pause - Função generica
+ - Mantem o conteudo na tela até que qualquer tecla seja pressionada.
+*/
 void pause()
 {
     flush();
@@ -253,4 +327,3 @@ void pause()
     getchar();
     flush();
 }
-
