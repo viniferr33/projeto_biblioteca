@@ -36,20 +36,37 @@ typedef struct livro
     struct info_aluno status[2];
 } livro;
 
+int quantia_livro();
+void cadastra_livro(livro *livros, int qtd);
+void gravar_livro(livro *livros);
+void consulta_livro(livro *livros, int qtd);
+int compara_string(char *principal, char *outra);
+void status_livro(struct info_aluno *status);
+void aloca_livro(livro **p, int qtd);
+char retorna_char();
+void pause();
+void flush();
+
 int main(int argc, char const *argv[])
 {
     system(clear);
+    int qtd_livro;
     livro *livros = NULL;
+
     aloca_livro(&livros, 1);
-    int qtd_livro = quantia_livro();
 
-    //cadastra_livro(livros, qtd_livro);
+    qtd_livro = quantia_livro();
+    cadastra_livro(livros, qtd_livro);
 
+    qtd_livro = quantia_livro();
     consulta_livro(livros, qtd_livro);
 
     return 0;
 }
 
+/*
+Quantifica a quantia de livros existente no arquivo de livros.
+*/
 int quantia_livro()
 {
     FILE *fptr = NULL;
@@ -66,6 +83,9 @@ int quantia_livro()
     }
 }
 
+/*
+É a preparação de terreno para gravar um livro no arquivo de livros.
+*/
 void cadastra_livro(livro *livros, int qtd)
 {
     livros->reg = qtd;
@@ -85,6 +105,9 @@ void cadastra_livro(livro *livros, int qtd)
     gravar_livro(livros);
 }
 
+/*
+É a gravação de fato no arquivo de livros.
+*/
 void gravar_livro(livro *livros)
 {
     FILE *fptr = NULL;
@@ -100,6 +123,9 @@ void gravar_livro(livro *livros)
     fclose(fptr);
 }
 
+/*
+Consulta o arquivo de livros de diversas formas, podendo procurar informações específicas.
+*/
 void consulta_livro(livro *livros, int qtd)
 {
     FILE *fptr = NULL;
@@ -112,13 +138,12 @@ void consulta_livro(livro *livros, int qtd)
     {
         printf("\n\nCONSULTA DE LIVROS\n\n[1] Todos os livros\n[2] Por status\n[3] Por titulo");
         flush();
-        op = getch();
-        ;
+        op = retorna_char();
         flush();
 
         switch (op)
         {
-        case '1':
+        case '1': //todos os livros
             for (i = 0; i < qtd - 1; i++)
             {
                 fseek(fptr, i * sizeof(livro), 0);
@@ -132,7 +157,7 @@ void consulta_livro(livro *livros, int qtd)
             pause();
             break;
 
-        case '2':
+        case '2': //livros por status
             printf("\n\nDigite o status desejado (\033[0;32mL - Livre\033[0m, \033[0;31mE - Emprestado\033[0m, \033[0;33mR - Reservado\033[0m): ");
 
             scanf("%c", &status);
@@ -143,7 +168,7 @@ void consulta_livro(livro *livros, int qtd)
                 fseek(fptr, i * sizeof(livro), 0);
                 fread(livros, sizeof(livro), 1, fptr);
 
-                if (livros->status->sigla == status)
+                if (tolower(livros->status->sigla) == tolower(status))
                 {
                     printf("\n\nRegistro de livro: %i\n\nTitulo: %s\nAutor: %s\n\n", livros->reg, livros->titulo, livros->autor);
                     status_livro(livros->status);
@@ -160,7 +185,7 @@ void consulta_livro(livro *livros, int qtd)
             pause();
             break;
 
-        case '3':
+        case '3': //livros por titulo
             printf("\n\nDigite o titulo desejado: ");
             gets(titulo);
             flush();
@@ -195,8 +220,12 @@ void consulta_livro(livro *livros, int qtd)
     } //funcionalidade do consulta_livro
 } //fim do consulta_livro
 
-int compara_string(char *principal, char *outra) //compara duas strings ignorando maiusculas e minusculas
-{                                                //vale-se notar que a enfase está no parâmetro "principal"
+/*
+Compara duas strings ignorando maiusculas e minusculas.
+Vale-se notar que a ênfase está no parâmetro "principal".
+*/
+int compara_string(char *principal, char *outra)
+{
     int i;
 
     if (strlen(principal) != strlen(outra))
@@ -211,6 +240,9 @@ int compara_string(char *principal, char *outra) //compara duas strings ignorand
     return 0;
 }
 
+/*
+Acessa e trabalha com o status de um livro.
+*/
 void status_livro(struct info_aluno *status)
 {
     if (status->sigla == 'L')
@@ -229,7 +261,10 @@ void status_livro(struct info_aluno *status)
     }
 }
 
-void aloca_livro(livro **p, int qtd) //alocação padrão para o ponteiro de livros
+/*
+Alocação dinâmica para o ponteiro de struct livro.
+*/
+void aloca_livro(livro **p, int qtd)
 {
     if ((*p = (livro *)realloc(*p, qtd * sizeof(livro))) == NULL)
     {
@@ -239,14 +274,44 @@ void aloca_livro(livro **p, int qtd) //alocação padrão para o ponteiro de liv
     }
 }
 
-void pause()
+/*
+Retorna um char, no Windows usa-se o getch(), no Linux é um scanf() normal.
+*/
+char retorna_char()
 {
-    printf("Pressione qualquer tecla para continuar. . .");
-    flush();
-    getch();
-    flush();
+    char op;
+// ## Esse trecho de código é executado durante a compilação ##
+#if defined(_WIN32) || defined(_WIN64) // Testa se o SO é Windows
+    op = getch();
+    return op;
+#else
+#ifdef __linux // Testa se o SO é Linux
+    printf("\n\nInsira a operacao desejada: ");
+    scanf("%c", &op);
+    return op;
+#endif
+#endif
 }
 
+/*
+Basicamente a função padrão system("pause"), porém com uma alternativa para Linux.
+*/
+void pause()
+{
+// ## Esse trecho de código é executado durante a compilação ##
+#if defined(_WIN32) || defined(_WIN64) // Testa se o SO é Windows
+    system("pause");
+#else
+#ifdef __linux // Testa se o SO é Linux
+    printf("Pressione ENTER para continuar. . .\n");
+    getchar();
+#endif
+#endif
+}
+
+/*
+Função para limpar o buffer do teclado para ambos Windows e Linux.
+*/
 void flush()
 {
 // ## Esse trecho de código é executado durante a compilação ##
