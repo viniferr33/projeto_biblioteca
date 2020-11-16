@@ -92,7 +92,10 @@ int main(int argc, char const *argv[])
     return 0;
 } //MAIN
 
-// ## Aloca Aluno ##
+/*
+Aloca Aluno - Função da Struct Aluno
+ - Realiza alocação dinamica da struct aluno.
+*/
 void aloca_aluno(aluno **p, int qtd)
 {
     if ((*p = (aluno *)realloc(*p, qtd * sizeof(aluno))) == NULL)
@@ -103,7 +106,10 @@ void aloca_aluno(aluno **p, int qtd)
     }
 }
 
-// ## Cadastra Aluno ##
+/*
+Cadastra Aluno - Função da Struct Aluno
+ - Cadastra um novo aluno na lista de alunos
+*/
 void cadastra_aluno(aluno *p, int qtd)
 {
     system(clear);
@@ -161,7 +167,10 @@ void cadastra_aluno(aluno *p, int qtd)
     pause();
 }
 
-// ## Consulta Total##
+/*
+Consulta Total - Função da Struct Aluno
+ - Imprime todos os alunos da lista de alunos
+*/
 void consulta_total(aluno *p, int qtd)
 {
     system(clear);
@@ -190,7 +199,10 @@ void consulta_total(aluno *p, int qtd)
     pause();
 }
 
-// ## Consulta Parcial ##
+/*
+Consulta Parcial - Função da Struct Aluno
+ - Busca e imprime determinado RA na lista de alunos.
+*/
 void consulta_parcial(aluno *p, int qtd)
 {
     system(clear);
@@ -259,7 +271,10 @@ void consulta_parcial(aluno *p, int qtd)
     pause();
 }
 
-// ## Quantia Alunos ##
+/*
+Quantia Aluno - Função da Struct Aluno
+ - Carrega os dados do arquivo 'aluno.bin' no ponteiro referente
+*/
 int quantia_aluno(aluno **p)
 {
     FILE *arq = NULL; // Ponteiro para arquivo
@@ -282,7 +297,10 @@ int quantia_aluno(aluno **p)
     }
 }
 
-// ## Grava aluno ##
+/*
+Grava Aluno - Função da Struct Aluno
+ - Salva a Struct aluno dada no ponteiro referente no arquivo 'aluno.bin'
+*/
 void grava_aluno(aluno *p, int qtd)
 {
     FILE *fl = NULL;
