@@ -356,7 +356,7 @@ void consulta_parcial(aluno *p, int qtd)
         }
     }
     if (flag == 0)
-        printf("\n\nO aluno referente a esse RA nao existe!\n");
+        printf("\nO aluno referente a esse RA nao existe!\n\n");
     pause();
 }
 
@@ -370,8 +370,8 @@ int quantia_aluno(aluno **p)
     int qtd;
     if ((arq = fopen("aluno.bin", "rb")) == NULL) // Testa se o arquivo existe
     {
-        printf("Não ha registros anteriores!");
-        pause();
+        printf("Nao ha arquivo de alunos!\n\n");
+    	pause();
         return 0;
     }
     else
@@ -477,7 +477,10 @@ void consulta_livro(livro *livros, int qtd)
     char op, status, titulo[80];
 
     if ((fptr = fopen("livros.bin", "rb")) == NULL)
-        printf("\n\n\033[0;31mErro ao abrir arquivo de livros!\033[0m\n\n");
+    {
+    	printf("\n\nNao ha arquivo de livros!\n\n");
+    	pause();
+	}
     else
     {
         do
