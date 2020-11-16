@@ -263,6 +263,13 @@ Consulta Total - Função da Struct Aluno
 void consulta_total(aluno *p, int qtd)
 {
     system(clear);
+ 	if(qtd == 0)
+ 	{
+		printf("Nao existem alunos no cadastro!\n\n");
+	}
+ 	
+ 	else
+ 	{
     int i;
     for (i = 0; i < qtd; i++)
     {
@@ -285,6 +292,7 @@ void consulta_total(aluno *p, int qtd)
             printf("\n\t- Reg: \033[0;36m%i\033[0;0m", regis);
         printf("\n\n");
     }
+	}
     pause();
 }
 
@@ -295,6 +303,13 @@ Consulta Parcial - Função da Struct Aluno
 void consulta_parcial(aluno *p, int qtd)
 {
     system(clear);
+    if(qtd == 0)
+ 	{
+		printf("Nao existem alunos no cadastro!\n\n");
+	}
+ 	
+ 	else
+ 	{
     printf("Digite o RA do aluno:\t");
     int aux_ra = 0;
     char RA[7];
@@ -357,7 +372,8 @@ void consulta_parcial(aluno *p, int qtd)
     }
     if (flag == 0)
         printf("\nO aluno referente a esse RA nao existe!\n\n");
-    pause();
+	}
+	pause();
 }
 
 /*
@@ -370,8 +386,8 @@ int quantia_aluno(aluno **p)
     int qtd;
     if ((arq = fopen("aluno.bin", "rb")) == NULL) // Testa se o arquivo existe
     {
-        printf("Nao ha arquivo de alunos!\n\n");
-    	pause();
+        //printf("Nao ha arquivo de alunos!\n\n");
+    	//pause();
         return 0;
     }
     else
@@ -401,8 +417,6 @@ void grava_aluno(aluno *p, int qtd)
     else
     {
         fwrite(p, sizeof(aluno), qtd, fl);
-        printf("\n\n\033[0;32mSalvo com sucesso!\033[0m\n");
-        pause();
     }
 }
 
