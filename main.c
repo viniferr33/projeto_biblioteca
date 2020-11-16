@@ -11,6 +11,7 @@ Yuri Carlos Achnitz Batista Belinski    RA: 200262
 // ## Esse trecho de código é executado durante a compilação ##
 #if defined(_WIN32) || defined(_WIN64) // Testa se o SO é Windows
 const char *clear = "cls";             // Define os comandos do sistema windows
+#include <conio.h>
 #else
 #ifdef __linux // Testa se o SO é Linux
 const char *clear = "clear"; // Define os comandos do sistema linux
@@ -334,13 +335,32 @@ void flush()
 }
 
 /*
-Pause - Função generica
- - Mantem o conteudo na tela até que qualquer tecla seja pressionada.
+Basicamente a função padrão system("pause"), porém com uma alternativa para Linux.
 */
 void pause()
 {
-    flush();
-    printf("Pressione qualquer tecla para continuar. . .");
+// ## Esse trecho de código é executado durante a compilação ##
+#if defined(_WIN32) || defined(_WIN64) // Testa se o SO é Windows
+    system("pause");
+#else
+#ifdef __linux // Testa se o SO é Linux
+    printf("Pressione ENTER para continuar. . .\n");
     getchar();
-    flush();
+#endif
+#endif
+}
+
+/*
+Função para limpar o buffer do teclado para ambos Windows e Linux.
+*/
+void flush()
+{
+// ## Esse trecho de código é executado durante a compilação ##
+#if defined(_WIN32) || defined(_WIN64) // Testa se o SO é Windows
+    fflush(stdin);
+#else
+#ifdef __linux // Testa se o SO é Linux
+    __fpurge(stdin);
+#endif
+#endif
 }
