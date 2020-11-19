@@ -63,11 +63,11 @@ Funções relacionadas a manipulação da struct "Aluno"
 */
 void aloca_aluno(aluno **p, int qtd);
 void mostra_alunos(aluno *p, int qtd);
-void cadastra_aluno(aluno *p, int qtd);
+void cadastra_aluno(aluno *p);
 void consulta_total(aluno *p, int qtd);
 void consulta_parcial(aluno *p, int qtd);
-int quantia_aluno(aluno **p);
-void grava_aluno(aluno *p, int qtd);
+int quantia_aluno();
+void grava_aluno(aluno *p);
 
 /*
 Funções para a struct "livro"
@@ -87,7 +87,8 @@ int main(int argc, char const *argv[])
     char op = '\0';
 
     aluno *alunos = NULL;
-    int qtd_a = quantia_aluno(&alunos);
+    int qtd_a;
+    aloca_aluno(&alunos, 1);
 
     int qtd_livro;
     livro *livros = NULL;
@@ -118,16 +119,17 @@ int main(int argc, char const *argv[])
                     break;
 
                 case '1':
-                    aloca_aluno(&alunos, qtd_a + 1);
-                    cadastra_aluno(alunos, qtd_a);
+                    cadastra_aluno(alunos);
                     qtd_a++;
                     break;
 
                 case '2':
+                    qtd_a = quantia_aluno();
                     consulta_total(alunos, qtd_a);
                     break;
 
                 case '3':
+                    qtd_a = quantia_aluno();
                     consulta_parcial(alunos, qtd_a);
                     break;
 
@@ -137,7 +139,6 @@ int main(int argc, char const *argv[])
                     break;
                 }
             } while (op != '0'); //switch dos alunos
-            grava_aluno(alunos, qtd_a);
             break;
 
         case '2':
@@ -199,30 +200,29 @@ void aloca_aluno(aluno **p, int qtd)
 Cadastra Aluno - Função da Struct Aluno
  - Cadastra um novo aluno na lista de alunos
 */
-void cadastra_aluno(aluno *p, int qtd)
+void cadastra_aluno(aluno *p)
 {
     system(clear);
     printf("### Cadastro de alunos ###\n\n");
 
     printf("Digite o nome do aluno:\t");
-    fgets((p + qtd)->nome, 79, stdin);
+    fgets(p->nome, 79, stdin);
     flush();
-    *((p + qtd)->nome + strlen((p + qtd)->nome) - 1) = '\0';
+    *(p->nome + strlen(p->nome) - 1) = '\0';
 
     printf("\nDigite o RA do aluno:\t");
     int aux_ra = 0;
     do
     {
-        flush();
-        scanf("%s", (p + qtd)->RA);
+        fgets(p->RA, 7, stdin);
         flush();
 
-        if (strlen((p + qtd)->RA) == 6)
+        if (strlen(p->RA) == 6)
         {
             int j;
             for (j = 0; j < 6; j++)
             {
-                if (isdigit(*((p + qtd)->RA + j)) == 0)
+                if (isdigit(*(p->RA + j)) == 0)
                 {
                     printf("\nO RA deve ser composto por digitos numericos!\nDigite o RA do aluno: ");
                     aux_ra = 0;
@@ -240,19 +240,20 @@ void cadastra_aluno(aluno *p, int qtd)
 
     } while (aux_ra == 0);
 
-    (p + qtd)->emprestado = 0;
-    (p + qtd)->reservado = 0;
+    p->emprestado = 0;
+    p->reservado = 0;
 
     int i;
     for (i = 0; i < 4; i++)
     {
-        ((p + qtd)->tabela + i)->sigla = 'L';
+        (p->tabela + i)->sigla = 'L';
     }
     system(clear);
     printf("\033[0;32m### Cadastro Realizado com sucesso!! ###\033[0m\n\n");
-    printf("Nome:\t\033[0;36m%s\033[0;0m\t", (p + qtd)->nome);
-    printf("RA: \t\033[0;36m%s\033[0;0m\n\n", (p + qtd)->RA);
+    printf("Nome:\t\033[0;36m%s\033[0;0m\t", p->nome);
+    printf("RA: \t\033[0;36m%s\033[0;0m\n\n", p->RA);
 
+    grava_aluno(p);
     pause();
 }
 
@@ -262,37 +263,40 @@ Consulta Total - Função da Struct Aluno
 */
 void consulta_total(aluno *p, int qtd)
 {
+
+    FILE *fl = NULL;
+    int i, j, regis = -1;
     system(clear);
- 	if(qtd == 0)
- 	{
-		printf("Nao existem alunos no cadastro!\n\n");
-	}
- 	
- 	else
- 	{
-    int i;
-    for (i = 0; i < qtd; i++)
+
+    if ((fl = fopen("aluno.bin", "rb")) == NULL)
+        printf("Nao existem alunos no cadastro!\n\n");
+
+    else
     {
-        printf("Nome:\t\033[0;36m%s\033[0;0m\t", (p + i)->nome);
-        printf("RA: \t\033[0;36m%s\033[0;0m\n", (p + i)->RA);
-        printf("Livros emprestados: \t\033[0;36m%i\033[0;0m", (p + i)->emprestado);
-
-        int j;
-        int regis = -1;
-        for (j = 0; j < 4; j++)
+        for (i = 0; i < qtd; i++)
         {
-            if (((p + i)->tabela + j)->sigla == 'E')
-                printf("\n\t- Reg: \033[0;36m%i\033[0;0m", ((p + i)->tabela + j)->reg);
-            else if (((p + i)->tabela + j)->sigla == 'R')
-                regis = ((p + i)->tabela + j)->reg;
-        }
+            fseek(fl, i * sizeof(aluno), 0);
+            fread(p, sizeof(aluno), 1, fl);
 
-        printf("\nLivros reservados: \t\033[0;36m%i\033[0;0m", (p + i)->reservado);
-        if (regis > 0)
-            printf("\n\t- Reg: \033[0;36m%i\033[0;0m", regis);
-        printf("\n\n");
+            printf("Nome:\t\033[0;36m%s\033[0;0m\t", p->nome);
+            printf("RA: \t\033[0;36m%s\033[0;0m\n", p->RA);
+            printf("Livros emprestados: \t\033[0;36m%i\033[0;0m", p->emprestado);
+
+            for (j = 0; j < 4; j++)
+            {
+                if ((p->tabela + j)->sigla == 'E')
+                    printf("\n\t- Reg: \033[0;36m%i\033[0;0m", (p->tabela + j)->reg);
+                else if ((p->tabela + j)->sigla == 'R')
+                    regis = (p->tabela + j)->reg;
+            }
+
+            printf("\nLivros reservados: \t\033[0;36m%i\033[0;0m", p->reservado);
+            if (regis > 0)
+                printf("\n\t- Reg: \033[0;36m%i\033[0;0m", regis);
+            printf("\n\n");
+        }
     }
-	}
+    fclose(fl);
     pause();
 }
 
@@ -302,101 +306,98 @@ Consulta Parcial - Função da Struct Aluno
 */
 void consulta_parcial(aluno *p, int qtd)
 {
+    FILE *fl = NULL;
     system(clear);
-    if(qtd == 0)
- 	{
-		printf("Nao existem alunos no cadastro!\n\n");
-	}
- 	
- 	else
- 	{
-    printf("Digite o RA do aluno:\t");
-    int aux_ra = 0;
-    char RA[7];
-    do
-    {
-        flush();
-        scanf("%s", RA);
-        flush();
 
-        if (strlen(RA) == 6)
+    if ((fl = fopen("aluno.bin", "rb")) == NULL)
+        printf("Nao existem alunos no cadastro!\n\n");
+
+    else
+    {
+        printf("Digite o RA do aluno:\t");
+        int aux_ra = 0;
+        char RA[7];
+        do
         {
-            int j;
-            for (j = 0; j < 6; j++)
+            fgets(RA, 7, stdin);
+            flush();
+
+            if (strlen(RA) == 6)
             {
-                if (isdigit(*(RA + j)) == 0)
+                int j;
+                for (j = 0; j < 6; j++)
                 {
-                    printf("\nO RA deve ser composto por digitos numericos!\nDigite o RA do aluno: ");
-                    aux_ra = 0;
-                    break;
+                    if (isdigit(*(RA + j)) == 0)
+                    {
+                        printf("\nO RA deve ser composto por digitos numericos!\nDigite o RA do aluno: ");
+                        aux_ra = 0;
+                        break;
+                    }
+                    else
+                        aux_ra = 1;
                 }
-                else
-                    aux_ra = 1;
             }
-        }
 
-        else
-        {
-            printf("\nO RA deve conter 6 digitos!\nDigite o RA do aluno: ");
-        }
-
-    } while (aux_ra == 0);
-
-    int i;
-    int flag = 0;
-    for (i = 0; i < qtd; i++)
-    {
-        if (strcmp((p + i)->RA, RA) == 0)
-        {
-            printf("\nNome:\t\033[0;36m%s\033[0;0m\t", (p + i)->nome);
-            printf("RA: \t\033[0;36m%s\033[0;0m\n", (p + i)->RA);
-            printf("Livros emprestados: \t\033[0;36m%i\033[0;0m", (p + i)->emprestado);
-
-            int j;
-            int regis = -1;
-            for (j = 0; j < 4; j++)
+            else
             {
-                if ((p + i)->tabela[j].sigla == 'E')
-                    printf("\n\t- Reg: \033[0;36m%i\033[0;0m", (p + i)->tabela[j].reg);
-                else if ((p + i)->tabela[j].sigla == 'R')
-                    regis = (p + i)->tabela[j].reg;
+                printf("\nO RA deve conter 6 digitos!\nDigite o RA do aluno: ");
             }
 
-            printf("\nLivros reservados: \t\033[0;36m%i\033[0;0m", (p + i)->reservado);
-            if (regis > 0)
-                printf("\n\t- Reg: \033[0;36m%i\033[0;0m", regis);
-            printf("\n\n");
-            flag = 1;
-            break;
+        } while (aux_ra == 0);
+
+        int i;
+        int flag = 0;
+        for (i = 0; i < qtd; i++)
+        {
+            fseek(fl, i * sizeof(aluno), 0);
+            fread(p, sizeof(aluno), 1, fl);
+
+            if (strcmp(p->RA, RA) == 0)
+            {
+                printf("\nNome:\t\033[0;36m%s\033[0;0m\t", p->nome);
+                printf("RA: \t\033[0;36m%s\033[0;0m\n", p->RA);
+                printf("Livros emprestados: \t\033[0;36m%i\033[0;0m", p->emprestado);
+
+                int j;
+                int regis = -1;
+                for (j = 0; j < 4; j++)
+                {
+                    if ((p->tabela + j)->sigla == 'E')
+                        printf("\n\t- Reg: \033[0;36m%i\033[0;0m", (p->tabela + j)->reg);
+                    else if ((p->tabela + j)->sigla == 'R')
+                        regis = (p->tabela + j)->reg;
+                }
+
+                printf("\nLivros reservados: \t\033[0;36m%i\033[0;0m", p->reservado);
+                if (regis > 0)
+                    printf("\n\t- Reg: \033[0;36m%i\033[0;0m", regis);
+                printf("\n\n");
+                flag = 1;
+                break;
+            }
         }
+        if (flag == 0)
+            printf("\nO aluno referente a esse RA nao existe!\n\n");
     }
-    if (flag == 0)
-        printf("\nO aluno referente a esse RA nao existe!\n\n");
-	}
-	pause();
+    fclose(fl);
+    pause();
 }
 
 /*
 Quantia Aluno - Função da Struct Aluno
  - Carrega os dados do arquivo 'aluno.bin' no ponteiro referente
 */
-int quantia_aluno(aluno **p)
+int quantia_aluno()
 {
     FILE *arq = NULL; // Ponteiro para arquivo
     int qtd;
     if ((arq = fopen("aluno.bin", "rb")) == NULL) // Testa se o arquivo existe
-    {
-        //printf("Nao ha arquivo de alunos!\n\n");
-    	//pause();
         return 0;
-    }
+
     else
     {
         fseek(arq, 0, 2);                 // Movimenta o ponteiro dentro do arquivo
         qtd = ftell(arq) / sizeof(aluno); // Retorna o tamanho do arquivo até o ponteiro
-        aloca_aluno(p, qtd);
-        rewind(arq);                        // Retorna o ponteiro do arquivo para a pos 0
-        fread(*p, sizeof(aluno), qtd, arq); // Lê o arquivo e o salva em p
         fclose(arq);
         return qtd;
     }
@@ -406,18 +407,19 @@ int quantia_aluno(aluno **p)
 Grava Aluno - Função da Struct Aluno
  - Salva a Struct aluno dada no ponteiro referente no arquivo 'aluno.bin'
 */
-void grava_aluno(aluno *p, int qtd)
+void grava_aluno(aluno *p)
 {
     FILE *fl = NULL;
-    if ((fl = fopen("aluno.bin", "wb")) == NULL)
+    if ((fl = fopen("aluno.bin", "ab")) == NULL)
     {
-        printf("\033[0;31mErro de gravacao!\033[0m");
+        printf("\033[0;31mErro ao abrir arquivo de alunos!!\033[0m");
         pause();
     }
     else
     {
-        fwrite(p, sizeof(aluno), qtd, fl);
+        fwrite(p, sizeof(aluno), 1, fl);
     }
+    fclose(fl);
 }
 
 /*
@@ -492,9 +494,9 @@ void consulta_livro(livro *livros, int qtd)
 
     if ((fptr = fopen("livros.bin", "rb")) == NULL)
     {
-    	printf("\n\nNao ha arquivo de livros!\n\n");
-    	pause();
-	}
+        printf("\n\nNao ha arquivo de livros!\n\n");
+        pause();
+    }
     else
     {
         do
