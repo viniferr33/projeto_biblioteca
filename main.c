@@ -246,7 +246,7 @@ void cadastra_aluno(aluno *p, int qtd)
     int i;
     for (i = 0; i < 4; i++)
     {
-        (p + qtd)->tabela[i].sigla = 'L';
+        ((p + qtd)->tabela + i)->sigla = 'L';
     }
     system(clear);
     printf("\033[0;32m### Cadastro Realizado com sucesso!! ###\033[0m\n\n");
@@ -281,10 +281,10 @@ void consulta_total(aluno *p, int qtd)
         int regis = -1;
         for (j = 0; j < 4; j++)
         {
-            if ((p + i)->tabela[j].sigla == 'E')
-                printf("\n\t- Reg: \033[0;36m%i\033[0;0m", (p + i)->tabela[j].reg);
-            else if ((p + i)->tabela[j].sigla == 'R')
-                regis = (p + i)->tabela[j].reg;
+            if (((p + i)->tabela + j)->sigla == 'E')
+                printf("\n\t- Reg: \033[0;36m%i\033[0;0m", ((p + i)->tabela + j)->reg);
+            else if (((p + i)->tabela + j)->sigla == 'R')
+                regis = ((p + i)->tabela + j)->reg;
         }
 
         printf("\nLivros reservados: \t\033[0;36m%i\033[0;0m", (p + i)->reservado);
