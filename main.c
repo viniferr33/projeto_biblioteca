@@ -205,7 +205,7 @@ void empresta(aluno *alunos, int qtd_a, livro *livros, int qtd_l)
     if (pos_a == -1)
         printf("\n\nO aluno informado nao foi encontrado no sistema! Verifique se o mesmo foi cadastrado anteriormente!\n\n");
     else if (alunos->emprestado > 3 && alunos->reservado == 1)
-        print("\n\nO aluno informado ja possui o numero maximo de emprestimos e reservas!\n\n");
+        printf("\n\nO aluno informado ja possui o numero maximo de emprestimos e reservas!\n\n");
 
     else
     {
