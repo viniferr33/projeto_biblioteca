@@ -211,7 +211,7 @@ void empresta(aluno *alunos, int qtd_a, livro *livros, int qtd_l)
     {
         qtd_l = quantia_livro();
         pos_l = busca_livro(livros, qtd_l);
-
+        
         if (pos_l == -1)
             printf("\n\nO livro informado nao foi encontrado no sistema! Verifique se o mesmo foi cadastrado anteriormente!\n\n");
 
@@ -249,6 +249,8 @@ void empresta(aluno *alunos, int qtd_a, livro *livros, int qtd_l)
             }
         }
     }
+
+    //modifica(alunos, pos_a, livros, pos_l);
     //
     //
     //  INSIRA UMA FUNÇÂO DE EDITAR OS ARQUIVOS AQUI
@@ -759,7 +761,7 @@ Busca determinado livro pelo titulo e armazena no ponteiro fornecido
 int busca_livro(livro *livros, int qtd)
 {
     FILE *fptr = NULL;
-    int i, achou;
+    int i, achou = 0;
     char titulo[80];
 
     if ((fptr = fopen("livros.bin", "rb")) == NULL)
@@ -785,12 +787,14 @@ int busca_livro(livro *livros, int qtd)
                 printf("\n\nRegistro de livro: %i\n\nTitulo: %s\nAutor: %s\n\n", livros->reg, livros->titulo, livros->autor);
                 status_livro(livros->status);
                 achou = 1;
-                return i;
+                break;
             }
         }
 
         if (achou == 0)
             return -1;
+        else
+            return i;
     }
     fclose(fptr);
     pause();
