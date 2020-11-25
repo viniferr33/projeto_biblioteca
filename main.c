@@ -51,6 +51,12 @@ typedef struct livro
     struct info_aluno status[2];
 } livro;
 
+typedef struct data
+{
+    int dia;
+    int mes;
+} data;
+
 /*
 Funções genericas do algoritmo
 */
@@ -85,11 +91,25 @@ void aloca_livro(livro **p, int qtd);
 /*
 Funções relacionadas a emprestimo de livros
 */
-void empresta(aluno *p, int qtd_a, livro *livros, int qtd_l);
+data adicionar_dia(data data_inicial, int quantos_dias);
+void empresta(data data_hoje, aluno *p, int qtd_a, livro *livros, int qtd_l);
 
 // ## MAIN ##
 int main(int argc, char const *argv[])
 {
+    int dias_aux;
+    data data_hoje, data_aux;
+    obter_data(&data_hoje);
+
+    printf("\n\nDia: %i\nMes: %i", data_hoje.dia, data_hoje.mes);
+
+    printf("\n\nQuantos dias de diferenca: ");
+    scanf("%i", &dias_aux);
+    flush();
+    data_aux = adicionar_dia(data_hoje, dias_aux);
+    printf("Dia final = %i\nMes final = %i\n\n", data_aux.dia, data_aux.mes);
+    pause();
+
     char opt = '\0';
     char op = '\0';
 
@@ -105,7 +125,7 @@ int main(int argc, char const *argv[])
     {
         system(clear);
 
-        printf("Ola, essa e a \033[0;35mBIBLIOTECA\033[0m\n\nVoce tem tres opcoes:\n[1] - Trabalhar com alunos\n[2] - Trabalhar com livros\n[0] - Sair");
+        printf("Ola, essa e a \033[0;35mBIBLIOTECA\033[0m\nDia: %i\tMes: %i\n\nVoce tem tres opcoes:\n[1] - Trabalhar com alunos\n[2] - Trabalhar com livros\n[0] - Sair", data_hoje.dia, data_hoje.mes);
         opt = retorna_char();
 
         switch (opt)
@@ -181,7 +201,7 @@ int main(int argc, char const *argv[])
 
         case '3':
             // ##### DEBUG #####
-            empresta(alunos, quantia_aluno(), livros, quantia_livro());
+            empresta(data_hoje, alunos, quantia_aluno(), livros, quantia_livro());
             break;
 
         default:
@@ -194,9 +214,12 @@ int main(int argc, char const *argv[])
     return 0;
 } //MAIN
 
-void empresta(aluno *alunos, int qtd_a, livro *livros, int qtd_l)
+void empresta(data data_hoje, aluno *alunos, int qtd_a, livro *livros, int qtd_l)
 {
     int pos_a, pos_l; //POSIÇÃO DO PONTEIRO DENTRO DOS ARQUIVOS
+
+    data data_emp, data_res;
+    //adicionar_dia(data_hoje, &data_emp, 7);
 
     system(clear);
     qtd_a = quantia_aluno();
@@ -211,7 +234,7 @@ void empresta(aluno *alunos, int qtd_a, livro *livros, int qtd_l)
     {
         qtd_l = quantia_livro();
         pos_l = busca_livro(livros, qtd_l);
-        
+
         if (pos_l == -1)
             printf("\n\nO livro informado nao foi encontrado no sistema! Verifique se o mesmo foi cadastrado anteriormente!\n\n");
 
@@ -223,6 +246,13 @@ void empresta(aluno *alunos, int qtd_a, livro *livros, int qtd_l)
                 //Primeiro status ta livre -> EMPRESTAR
                 (livros->status + 0)->sigla = 'E';
                 strcpy((livros->status + 0)->RA, alunos->RA);
+
+                (livros->status + 0)->dia_ret = data_hoje.dia;
+                (livros->status + 0)->mes_ret = data_hoje.mes;
+
+                (livros->status + 0)->dia_dev = adicionar_dia(data_hoje, 7).dia;
+                (livros->status + 0)->mes_dev = adicionar_dia(data_hoje, 7).mes;
+
                 alunos->emprestado++;
                 (alunos->tabela + alunos->emprestado)->reg = livros->reg;
                 (alunos->tabela + alunos->emprestado)->sigla = 'E';
@@ -240,11 +270,21 @@ void empresta(aluno *alunos, int qtd_a, livro *livros, int qtd_l)
                     {
                         (livros->status + 1)->sigla = 'R';
                         strcpy((livros->status + 1)->RA, alunos->RA);
+
+                        data_res.dia = (livros->status + 0)->dia_dev;
+                        data_res.mes = (livros->status + 0)->mes_dev;
+                        data_res = adicionar_dia(data_res, 1);
+
+                        (livros->status + 1)->dia_ret = data_res.dia;
+                        (livros->status + 1)->mes_ret = data_res.mes;
+
+                        (livros->status + 1)->dia_dev = adicionar_dia(data_res, 7).dia;
+                        (livros->status + 1)->mes_dev = adicionar_dia(data_res, 7).mes;
+
                         alunos->reservado++;
                         (alunos->tabela + 3)->reg = livros->reg;
                         (alunos->tabela + 3)->sigla = 'R';
                     }
-                    
                 }
             }
         }
@@ -852,6 +892,94 @@ void aloca_livro(livro **p, int qtd)
         pause();
         exit(1);
     }
+}
+
+/*
+Guarda uma data num ponteiro data e considera a quantia de dias em um mes.
+*/
+void obter_data(data *data_hoje)
+{
+    int op;
+    do
+    {
+        system(clear);
+        op = 1;
+        printf("Insira o mes atual: ");
+        scanf("%i", &data_hoje->mes);
+        flush();
+        if (data_hoje->mes < 1 || data_hoje->mes > 12)
+        {
+            printf("\n\033[0;31mMes invalido!\033[0m\n\n");
+            op = 0;
+            pause();
+        }
+        else
+        {
+            printf("Insira o dia atual: ");
+            scanf("%i", &data_hoje->dia);
+            flush();
+            if (data_hoje->dia <= 0 || (data_hoje->dia > 31 && (data_hoje->mes == 1 || data_hoje->mes == 3 || data_hoje->mes == 5 || data_hoje->mes == 7 || data_hoje->mes == 8 || data_hoje->mes == 10 || data_hoje->mes == 12)))
+            {
+                printf("\n\033[0;31mEsse dia nao existe!\033[0m\n\n");
+                op = 0;
+                pause();
+            }
+            else if (data_hoje->dia <= 0 || (data_hoje->dia > 30 && (data_hoje->mes == 4 || data_hoje->mes == 6 || data_hoje->mes == 9 || data_hoje->mes == 11)))
+            {
+                printf("\n\033[0;31mEsse dia nao existe!\033[0m\n\n");
+                op = 0;
+                pause();
+            }
+            else if (data_hoje->dia <= 0 || (data_hoje->dia > 28 && data_hoje->mes == 2))
+            {
+                printf("\n\033[0;31mEsse dia nao existe!\033[0m\n\n");
+                op = 0;
+                pause();
+            }
+        }
+    } while (op == 0);
+}
+
+/*
+Retorna uma struct de data a partir de uma data inicial considerando a quantia de dias em um mes.
+*/
+data adicionar_dia(data data_inicial, int quantos_dias)
+{
+    int i;
+    data data_aux;
+
+    data_aux = data_inicial;
+
+    for (i = 0; i < quantos_dias; i++)
+    {
+        data_aux.dia += 1;
+
+        if (data_aux.dia > 31 && (data_aux.mes == 1 || data_aux.mes == 3 || data_aux.mes == 5 || data_aux.mes == 7 || data_aux.mes == 8 || data_aux.mes == 10 || data_aux.mes == 12))
+        {
+            if (data_aux.mes == 12)
+            {
+                data_aux.dia = 1;
+                data_aux.mes = 1;
+            }
+            else
+            {
+                data_aux.dia = 1;
+                data_aux.mes += 1;
+            }
+        }
+        else if (data_aux.dia > 30 && (data_aux.mes == 4 || data_aux.mes == 6 || data_aux.mes == 9 || data_aux.mes == 11))
+        {
+            data_aux.dia = 1;
+            data_aux.mes += 1;
+        }
+        else if (data_aux.dia > 28 && data_aux.mes == 2)
+        {
+            data_aux.dia = 1;
+            data_aux.mes += 1;
+        }
+    }
+
+    return data_aux;
 }
 
 /*
