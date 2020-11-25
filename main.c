@@ -63,12 +63,13 @@ Funções genericas do algoritmo
 void pause();
 void flush();
 char retorna_char();
+data adicionar_dia(data data_inicial, int quantos_dias);
+void obter_data(data *data_hoje);
 
 /*
 Funções relacionadas a manipulação da struct "Aluno"
 */
 void aloca_aluno(aluno **p, int qtd);
-void mostra_alunos(aluno *p, int qtd);
 void cadastra_aluno(aluno *p);
 void consulta_total(aluno *p, int qtd);
 void consulta_parcial(aluno *p, int qtd);
@@ -91,8 +92,6 @@ void aloca_livro(livro **p, int qtd);
 /*
 Funções relacionadas a emprestimo de livros
 */
-void obter_data(data *data_hoje);
-data adicionar_dia(data data_inicial, int quantos_dias);
 void empresta(data data_hoje, aluno *p, int qtd_a, livro *livros, int qtd_l);
 void modifica(aluno *pa, int pos_a, livro *pl, int pos_l);
 
@@ -102,15 +101,6 @@ int main(int argc, char const *argv[])
     int dias_aux;
     data data_hoje, data_aux;
     obter_data(&data_hoje);
-
-    printf("\n\nDia: %i\nMes: %i", data_hoje.dia, data_hoje.mes);
-
-    printf("\n\nQuantos dias de diferenca: ");
-    scanf("%i", &dias_aux);
-    flush();
-    data_aux = adicionar_dia(data_hoje, dias_aux);
-    printf("Dia final = %i\nMes final = %i\n\n", data_aux.dia, data_aux.mes);
-    pause();
 
     char opt = '\0';
     char op = '\0';
@@ -127,7 +117,7 @@ int main(int argc, char const *argv[])
     {
         system(clear);
 
-        printf("Ola, essa e a \033[0;35mBIBLIOTECA\033[0m\nDia: %i\tMes: %i\n\nVoce tem tres opcoes:\n[1] - Trabalhar com alunos\n[2] - Trabalhar com livros\n[0] - Sair", data_hoje.dia, data_hoje.mes);
+        printf("Ola, essa e a \033[0;35mBIBLIOTECA\033[0m\nDia: %i\tMes: %i\n\nOpcoes:\n[1] - Cadastro e consulta de alunos\n[2] - Cadastro e consulta de livros\n[3] - Fazer emprestimo\n[0] - Sair", data_hoje.dia, data_hoje.mes);
         opt = retorna_char();
 
         switch (opt)
@@ -218,10 +208,9 @@ int main(int argc, char const *argv[])
 
 void empresta(data data_hoje, aluno *alunos, int qtd_a, livro *livros, int qtd_l)
 {
-    int pos_a, pos_l, safe_flag = 0, op_flag;//POSIÇÃO DO PONTEIRO DENTRO DOS ARQUIVOS, SAFE FLAG PARA EVITAR ERROS E MORTE, OPERATION FLAG INDICA QUAL FOI A OPERAÇÂO REALIZADA
+    int pos_a, pos_l, safe_flag = 0, op_flag; //POSIÇÃO DO PONTEIRO DENTRO DOS ARQUIVOS, SAFE FLAG PARA EVITAR ERROS E MORTE, OPERATION FLAG INDICA QUAL FOI A OPERAÇÂO REALIZADA
 
     data data_emp, data_res;
-    //adicionar_dia(data_hoje, &data_emp, 7);
 
     system(clear);
     qtd_a = quantia_aluno();
@@ -229,16 +218,14 @@ void empresta(data data_hoje, aluno *alunos, int qtd_a, livro *livros, int qtd_l
 
     if (pos_a == -1)
     {
-        printf("\n\nO aluno informado nao foi encontrado no sistema! Verifique se o mesmo foi cadastrado anteriormente!\n\n");
+        printf("\n\n\033[0;31mO aluno informado nao foi encontrado no sistema! Verifique se o mesmo foi cadastrado anteriormente!\033[0m\n\n");
         safe_flag = 1;
     }
     else if (alunos->emprestado > 3 && alunos->reservado == 1)
     {
-        printf("\n\nO aluno informado ja possui o numero maximo de emprestimos e reservas!\n\n");
+        printf("\n\n\033[0;31mO aluno informado ja possui o numero maximo de emprestimos e reservas!\033[0m\n\n");
         safe_flag = 1;
     }
-
-    
 
     else
     {
@@ -247,7 +234,7 @@ void empresta(data data_hoje, aluno *alunos, int qtd_a, livro *livros, int qtd_l
 
         if (pos_l == -1)
         {
-            printf("\n\nO livro informado nao foi encontrado no sistema! Verifique se o mesmo foi cadastrado anteriormente!\n\n");
+            printf("\n\n\033[0;31mO livro informado nao foi encontrado no sistema! Verifique se o mesmo foi cadastrado anteriormente!\033[0m\n\n");
             safe_flag = 1;
         }
 
@@ -256,15 +243,15 @@ void empresta(data data_hoje, aluno *alunos, int qtd_a, livro *livros, int qtd_l
             // ## VALIDAÇÕES ##
             if ((livros->status + 0)->sigla == 'L')
             {
-                if(alunos->emprestado > 2)
+                if (alunos->emprestado > 2)
                 {
-                    printf("\n\nO aluno informado ja possui o numero maximo de emprestimos!\n\n");
+                    printf("\n\n\033[0;31mO aluno informado ja possui o numero maximo de emprestimos!\033[0m\n\n");
                     safe_flag = 1;
                 }
 
                 else
                 {
-                //Primeiro status ta livre -> EMPRESTAR
+                    //Primeiro status ta livre -> EMPRESTAR
                     (livros->status + 0)->sigla = 'E';
                     strcpy((livros->status + 0)->RA, alunos->RA);
 
@@ -279,13 +266,12 @@ void empresta(data data_hoje, aluno *alunos, int qtd_a, livro *livros, int qtd_l
                     alunos->emprestado++;
                     op_flag = 1;
                 }
-                            
             }
             else
             {
                 if ((livros->status + 1)->sigla == 'R')
                 {
-                    printf("O livro encontra-se indisponivel ate dia:\n\n");
+                    printf("\033[0;31mO livro encontra-se indisponivel!\033[0m\n\n");
                     safe_flag = 1;
                 }
 
@@ -294,7 +280,7 @@ void empresta(data data_hoje, aluno *alunos, int qtd_a, livro *livros, int qtd_l
                     //Não tinha nada no segundo status -> RESERVAR
                     if (alunos->reservado == 1)
                     {
-                        printf("\n\nO aluno ja possui o numero maximo de reservas!\n\n");
+                        printf("\n\n\033[0;31mO aluno ja possui o numero maximo de reservas!\033[0m\n\n");
                         safe_flag = 1;
                     }
                     else
@@ -322,21 +308,19 @@ void empresta(data data_hoje, aluno *alunos, int qtd_a, livro *livros, int qtd_l
         }
     }
 
-    if(safe_flag == 0)
+    if (safe_flag == 0)
     {
         modifica(alunos, pos_a, livros, pos_l);
-        if(op_flag == 1)
-            printf("\n\nO livro foi emprestado com sucesso!\n\n");
-        else if(op_flag == 2)
-            printf("\n\nO livro foi reservado com sucesso!\n\n");
-
+        if (op_flag == 1)
+            printf("\n\n\033[0;32mO livro foi \033[0;31memprestado\033[0;32m com sucesso!\033[0m\n\n");
+        else if (op_flag == 2)
+            printf("\n\n\033[0;32mO livro foi \033[0;33reservado\033[0;32m com sucesso!\033[0m\n\n");
     }
 
     else
     {
-        printf("\n\nNada foi alterado!\n\n");
+        printf("\n\n\033[0;31mNada foi alterado!\033[0m\n\n");
     }
-    
 
     pause();
 }
@@ -452,7 +436,7 @@ void consulta_total(aluno *p, int qtd)
             printf("\nLivros reservados: \t\033[0;36m%i\033[0;0m", p->reservado);
             if (regis > 0)
                 printf("\n\t- Reg: \033[0;36m%i\033[0;0m", (p->tabela + 3)->reg);
-                regis = 0;
+            regis = 0;
             printf("\n\n");
         }
     }
@@ -656,32 +640,31 @@ Modifica Arquivo - Função de emprestimo
 void modifica(aluno *pa, int pos_a, livro *pl, int pos_l)
 {
     FILE *fptr = NULL;
-    if((fptr = fopen("aluno.bin", "rb+")) == NULL)
+    if ((fptr = fopen("aluno.bin", "rb+")) == NULL)
     {
         printf("\033[0;31mErro ao modificar arquivo de alunos!!\033[0m");
         pause();
     }
     else
     {
-        fseek(fptr, pos_a*sizeof(aluno), 0);
+        fseek(fptr, pos_a * sizeof(aluno), 0);
         fwrite(pa, sizeof(aluno), 1, fptr);
     }
     fclose(fptr);
 
     FILE *fl = NULL;
-    if((fl = fopen("livros.bin", "rb+")) == NULL)
+    if ((fl = fopen("livros.bin", "rb+")) == NULL)
     {
         printf("\033[0;31mErro ao modificar arquivo de livros!!\033[0m");
         pause();
     }
     else
     {
-        fseek(fl, pos_l*sizeof(livro), 0);
+        fseek(fl, pos_l * sizeof(livro), 0);
         fwrite(pl, sizeof(livro), 1, fl);
     }
     fclose(fl);
 }
-
 
 /*
 Grava Aluno - Função da Struct Aluno
@@ -817,7 +800,7 @@ void consulta_livro(livro *livros, int qtd)
                     fseek(fptr, i * sizeof(livro), 0);
                     fread(livros, sizeof(livro), 1, fptr);
 
-                    if (tolower(livros->status->sigla) == tolower(status))
+                    if (tolower(livros->status->sigla) == tolower(status) || tolower((livros->status + 1)->sigla) == tolower(status))
                     {
                         printf("\n\nRegistro de livro: %i\n\nTitulo: %s\nAutor: %s\n\n", livros->reg, livros->titulo, livros->autor);
                         status_livro(livros->status);
@@ -949,13 +932,15 @@ void status_livro(struct info_aluno *status)
 
     if (status->sigla == 'E')
     {
-        printf("Status: \033[0;31mEmprestado\033[0m\n");
+        printf("Status: \033[0;31mEmprestado\033[0m\nRA do portador: %s\nRet - Dia: %i\tMes: %i\nDev - Dia: %i\tMes: %i\n", status->RA, status->dia_ret, status->mes_ret, status->dia_dev, status->mes_dev);
+
+        if ((status + 1)->sigla == 'R')
+        {
+            printf("Status: \033[0;33mReservado\033[0m\nRA do portador: %s\nRet - Dia: %i\tMes: %i\nDev - Dia: %i\tMes: %i\n", (status + 1)->RA, (status + 1)->dia_ret, (status + 1)->mes_ret, (status + 1)->dia_dev, (status + 1)->mes_dev);
+        }
     }
 
-    if (status->sigla == 'R')
-    {
-        printf("Status: \033[0;33mReservado3[0m\n");
-    }
+    printf("\n#########################################################################");
 }
 
 /*
