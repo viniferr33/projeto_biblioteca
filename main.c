@@ -271,7 +271,8 @@ void empresta(data data_hoje, aluno *alunos, int qtd_a, livro *livros, int qtd_l
             {
                 if ((livros->status + 1)->sigla == 'R')
                 {
-                    printf("\033[0;31mO livro encontra-se indisponivel!\033[0m\n\n");
+                    printf("\n\nO livro encontra-se \033[0;33mreservado\033[0m ate o dia %i do mes %i.\n\n",(livros->status+1)->dia_dev,(livros->status+1)->mes_dev);
+
                     safe_flag = 1;
                 }
 
@@ -319,7 +320,7 @@ void empresta(data data_hoje, aluno *alunos, int qtd_a, livro *livros, int qtd_l
 
     else
     {
-        printf("\n\n\033[0;31mNada foi alterado!\033[0m\n\n");
+        printf("\n\033[0;31mNada foi alterado!\033[0m\n\n");
     }
 
     pause();
@@ -781,7 +782,7 @@ void consulta_livro(livro *livros, int qtd)
                     fseek(fptr, i * sizeof(livro), 0);
                     fread(livros, sizeof(livro), 1, fptr);
 
-                    printf("\n\nRegistro de livro: %i\n\nTitulo: %s\nAutor: %s\n\n", livros->reg, livros->titulo, livros->autor);
+                    printf("\n\nRegistro de livro: \033[0;36m%i\033[0m\n\nTitulo: \033[0;36m%s\033[0m\nAutor: \033[0;36m%s\033[0m\n\n", livros->reg, livros->titulo, livros->autor);
                     status_livro(livros->status);
                 }
 
@@ -802,7 +803,7 @@ void consulta_livro(livro *livros, int qtd)
 
                     if (tolower(livros->status->sigla) == tolower(status) || tolower((livros->status + 1)->sigla) == tolower(status))
                     {
-                        printf("\n\nRegistro de livro: %i\n\nTitulo: %s\nAutor: %s\n\n", livros->reg, livros->titulo, livros->autor);
+                        printf("\n\nRegistro de livro: \033[0;36m%i\033[0m\n\nTitulo: \033[0;36m%s\033[0m\nAutor: \033[0;36m%s\033[0m\n\n", livros->reg, livros->titulo, livros->autor);
                         status_livro(livros->status);
                         achou = 1;
                     }
@@ -829,7 +830,7 @@ void consulta_livro(livro *livros, int qtd)
 
                     if (compara_string(titulo, livros->titulo) == 0)
                     {
-                        printf("\n\nRegistro de livro: %i\n\nTitulo: %s\nAutor: %s\n\n", livros->reg, livros->titulo, livros->autor);
+                        printf("\n\nRegistro de livro: \033[0;36m%i\033[0m\n\nTitulo: \033[0;36m%s\033[0m\nAutor: \033[0;36m%s\033[0m\n\n", livros->reg, livros->titulo, livros->autor);
                         status_livro(livros->status);
                         achou = 1;
                     }
@@ -932,11 +933,11 @@ void status_livro(struct info_aluno *status)
 
     if (status->sigla == 'E')
     {
-        printf("Status: \033[0;31mEmprestado\033[0m\nRA do portador: %s\nRet - Dia: %i\tMes: %i\nDev - Dia: %i\tMes: %i\n", status->RA, status->dia_ret, status->mes_ret, status->dia_dev, status->mes_dev);
+        printf("Status: \033[0;31mEmprestado\033[0m\nRA do portador: \033[0;36m%s\033[0m\nRet - Dia: \033[0;36m%i\033[0m\tMes: \033[0;36m%i\033[0m\nDev - Dia: \033[0;36m%i\033[0m\tMes: \033[0;36m%i\033[0m\n", status->RA, status->dia_ret, status->mes_ret, status->dia_dev, status->mes_dev);
 
         if ((status + 1)->sigla == 'R')
         {
-            printf("Status: \033[0;33mReservado\033[0m\nRA do portador: %s\nRet - Dia: %i\tMes: %i\nDev - Dia: %i\tMes: %i\n", (status + 1)->RA, (status + 1)->dia_ret, (status + 1)->mes_ret, (status + 1)->dia_dev, (status + 1)->mes_dev);
+            printf("Status: \033[0;33mReservado\033[0m\nRA do portador: \033[0;36m%s\033[0m\nRet - Dia: \033[0;36m%i\033[0m\tMes: \033[0;36m%i\033[0m\nDev - Dia: \033[0;36m%i\033[0m\tMes: \033[0;36m%i\033[0m\n", (status + 1)->RA, (status + 1)->dia_ret, (status + 1)->mes_ret, (status + 1)->dia_dev, (status + 1)->mes_dev);
         }
     }
 
