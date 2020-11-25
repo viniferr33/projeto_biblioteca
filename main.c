@@ -423,19 +423,19 @@ void consulta_total(aluno *p, int qtd)
 
             printf("Nome:\t\033[0;36m%s\033[0;0m\t", p->nome);
             printf("RA: \t\033[0;36m%s\033[0;0m\n", p->RA);
-            printf("Livros emprestados: \t\033[0;36m%i\033[0;0m", p->emprestado);
+            printf("Livros \033[0;31memprestados\033[0;0m: \t\033[0;36m%i\033[0;0m", p->emprestado);
 
             for (j = 0; j < 4; j++)
             {
                 if ((p->tabela + j)->sigla == 'E')
-                    printf("\n\t- Reg: \033[0;36m%i\033[0;0m", (p->tabela + j)->reg);
+                    printf("\n\t- Reg: \033[0;36m%i\033[0;0m - Sigla: \033[0;31m%c\033[0;0m", (p->tabela + j)->reg, (p->tabela + j)->sigla);
                 else if ((p->tabela + j)->sigla == 'R')
-                    regis = (p->tabela + j)->reg;
+                    regis = 1;
             }
 
-            printf("\nLivros reservados: \t\033[0;36m%i\033[0;0m", p->reservado);
+            printf("\nLivros \033[0;33mreservados\033[0;0m: \t\033[0;36m%i\033[0;0m", p->reservado);
             if (regis > 0)
-                printf("\n\t- Reg: \033[0;36m%i\033[0;0m", (p->tabela + 3)->reg);
+                printf("\n\t- Reg: \033[0;36m%i\033[0;0m - Sigla: \033[0;33m%c\033[0;0m", (p->tabela + 3)->reg, (p->tabela + 3)->sigla);
             regis = 0;
             printf("\n\n");
         }
@@ -500,21 +500,21 @@ void consulta_parcial(aluno *p, int qtd)
             {
                 printf("\nNome:\t\033[0;36m%s\033[0;0m\t", p->nome);
                 printf("RA: \t\033[0;36m%s\033[0;0m\n", p->RA);
-                printf("Livros emprestados: \t\033[0;36m%i\033[0;0m", p->emprestado);
+                printf("Livros \033[0;31memprestados\033[0;0m: \t\033[0;36m%i\033[0;0m", p->emprestado);
 
                 int j;
                 int regis = -1;
                 for (j = 0; j < 4; j++)
                 {
                     if ((p->tabela + j)->sigla == 'E')
-                        printf("\n\t- Reg: \033[0;36m%i\033[0;0m", (p->tabela + j)->reg);
+                        printf("\n\t- Reg: \033[0;36m%i\033[0;0m - Sigla: \033[0;31m%c\033[0;0m", (p->tabela + j)->reg, (p->tabela + j)->sigla);
                     else if ((p->tabela + j)->sigla == 'R')
-                        regis = (p->tabela + j)->reg;
+                        regis = 1;
                 }
 
-                printf("\nLivros reservados: \t\033[0;36m%i\033[0;0m", p->reservado);
+                printf("\nLivros \033[0;33mreservados\033[0;0m: \t\033[0;36m%i\033[0;0m", p->reservado);
                 if (regis > 0)
-                    printf("\n\t- Reg: \033[0;36m%i\033[0;0m", regis);
+                    printf("\n\t- Reg: \033[0;36m%i\033[0;0m - Sigla: \033[0;33m%c\033[0;0m", (p->tabela + 3)->reg, (p->tabela + 3)->sigla);
                 printf("\n\n");
                 flag = 1;
                 break;
