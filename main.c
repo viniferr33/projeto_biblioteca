@@ -60,15 +60,16 @@ typedef struct data
 /*
 Funções genericas do algoritmo
 */
+//
 void pause();
 void flush();
 char retorna_char();
-data adicionar_dia(data data_inicial, int quantos_dias);
 void obter_data(data *data_hoje);
 
 /*
 Funções relacionadas a manipulação da struct "Aluno"
 */
+//
 void aloca_aluno(aluno **p, int qtd);
 void cadastra_aluno(aluno *p);
 void consulta_total(aluno *p, int qtd);
@@ -80,6 +81,7 @@ void grava_aluno(aluno *p);
 /*
 Funções para a struct "livro"
 */
+//
 int quantia_livro();
 void cadastra_livro(livro *livros, int qtd);
 void gravar_livro(livro *livros);
@@ -90,10 +92,15 @@ void status_livro(struct info_aluno *status);
 void aloca_livro(livro **p, int qtd);
 
 /*
-Funções relacionadas a emprestimo de livros
+Funções relacionadas a emprestimo e devolução de livros
 */
-void empresta(data data_hoje, aluno *p, int qtd_a, livro *livros, int qtd_l);
+//
+void empresta(data data_hoje, aluno *p, livro *livros);
 void modifica(aluno *pa, int pos_a, livro *pl, int pos_l);
+void devolve(data data_hoje, aluno *alunos, livro *livros);
+int busca_livro_ra(livro *livros, int qtd, aluno *alunos);
+data adicionar_dia(data data_inicial, int quantos_dias);
+int comparar_dia(data data_principal, data data_comp);
 
 // ## MAIN ##
 int main(int argc, char const *argv[])
@@ -101,6 +108,12 @@ int main(int argc, char const *argv[])
     int dias_aux;
     data data_hoje, data_aux;
     obter_data(&data_hoje);
+
+    //obter_data(&data_aux);
+
+    //dias_aux = comparar_dia(data_hoje, data_aux);
+    //printf("\n\nDias de diferenca: %i\n\n", dias_aux);
+    //pause();
 
     char opt = '\0';
     char op = '\0';
@@ -192,8 +205,7 @@ int main(int argc, char const *argv[])
             break;
 
         case '3':
-            // ##### DEBUG #####
-            empresta(data_hoje, alunos, quantia_aluno(), livros, quantia_livro());
+            empresta(data_hoje, alunos, livros);
             break;
 
         default:
@@ -206,13 +218,14 @@ int main(int argc, char const *argv[])
     return 0;
 } //MAIN
 
-void empresta(data data_hoje, aluno *alunos, int qtd_a, livro *livros, int qtd_l)
+void empresta(data data_hoje, aluno *alunos, livro *livros)
 {
-    int pos_a, pos_l, safe_flag = 0, op_flag; //POSIÇÃO DO PONTEIRO DENTRO DOS ARQUIVOS, SAFE FLAG PARA EVITAR ERROS E MORTE, OPERATION FLAG INDICA QUAL FOI A OPERAÇÂO REALIZADA
+    int pos_a, pos_l, qtd_a, qtd_l, safe_flag = 0, op_flag; //POSIÇÃO DO PONTEIRO DENTRO DOS ARQUIVOS, SAFE FLAG PARA EVITAR ERROS E MORTE, OPERATION FLAG INDICA QUAL FOI A OPERAÇÂO REALIZADA
 
     data data_emp, data_res;
 
     system(clear);
+
     qtd_a = quantia_aluno();
     pos_a = busca_aluno(alunos, qtd_a);
 
@@ -237,7 +250,6 @@ void empresta(data data_hoje, aluno *alunos, int qtd_a, livro *livros, int qtd_l
             printf("\n\n\033[0;31mO livro informado nao foi encontrado no sistema! Verifique se o mesmo foi cadastrado anteriormente!\033[0m\n\n");
             safe_flag = 1;
         }
-
         else
         {
             // ## VALIDAÇÕES ##
@@ -271,7 +283,7 @@ void empresta(data data_hoje, aluno *alunos, int qtd_a, livro *livros, int qtd_l
             {
                 if ((livros->status + 1)->sigla == 'R')
                 {
-                    printf("\n\nO livro encontra-se \033[0;33mreservado\033[0m ate o dia %i do mes %i.\n\n",(livros->status+1)->dia_dev,(livros->status+1)->mes_dev);
+                    printf("\n\nO livro encontra-se \033[0;33mreservado\033[0m ate o dia %i do mes %i.\n\n", (livros->status + 1)->dia_dev, (livros->status + 1)->mes_dev);
 
                     safe_flag = 1;
                 }
@@ -303,6 +315,163 @@ void empresta(data data_hoje, aluno *alunos, int qtd_a, livro *livros, int qtd_l
                         (alunos->tabela + 3)->sigla = 'R';
                         alunos->reservado++;
                         op_flag = 2;
+                    }
+                }
+            }
+        }
+    }
+
+    if (safe_flag == 0)
+    {
+        modifica(alunos, pos_a, livros, pos_l);
+        if (op_flag == 1)
+            printf("\n\n\033[0;32mO livro foi \033[0;31memprestado\033[0;32m com sucesso!\033[0m\n\n");
+        else if (op_flag == 2)
+            printf("\n\n\033[0;32mO livro foi \033[0;33mreservado\033[0;32m com sucesso!\033[0m\n\n");
+    }
+
+    else
+    {
+        printf("\n\033[0;31mNada foi alterado!\033[0m\n\n");
+    }
+
+    pause();
+}
+
+void devolve(data data_hoje, aluno *alunos, livro *livros)
+{
+    int pos_a, pos_l, qtd_a, qtd_l, safe_flag = 0, op_flag = 0;
+    data data_dev;
+
+    system(clear);
+
+    qtd_a = quantia_aluno();
+    pos_a = busca_aluno(alunos, qtd_a);
+
+    if (pos_a == -1)
+    {
+        printf("\n\n\033[0;31mO aluno informado nao foi encontrado no sistema! Verifique se o mesmo foi cadastrado anteriormente!\033[0m\n\n");
+        safe_flag = 1;
+    }
+    else if (alunos->emprestado == 0)
+    {
+        printf("\n\n\033[0;31mO aluno informado nao possui nenhum livro emprestado!\033[0m\n\n");
+        safe_flag = 1;
+    }
+
+    else
+    {
+        qtd_l = quantia_livro();
+        pos_l = busca_livro_ra(livros, qtd_l, alunos);
+
+        if (pos_l == -1)
+        {
+            printf("\n\n\033[0;31mO livro informado nao foi emprestado para esse aluno!\033[0m\n\n");
+            safe_flag = 1;
+        }
+        else
+        {
+            data_dev.dia = livros->status->dia_dev;
+            data_dev.mes = livros->status->mes_dev;
+
+            if (comparar_dia(data_hoje, data_dev) == 0)
+            {
+                if (tolower((livros->status + 1)->sigla) == tolower('R'))
+                {
+                    livros->status->sigla = 'E';
+                    (livros->status + 1)->sigla = '\0';
+
+                    strcpy(livros->status->RA, (livros->status + 1)->RA);
+
+                    livros->status->dia_ret = (livros->status + 1)->dia_ret;
+                    livros->status->mes_ret = (livros->status + 1)->mes_ret;
+
+                    livros->status->dia_dev = (livros->status + 1)->dia_dev;
+                    livros->status->mes_dev = (livros->status + 1)->mes_dev;
+                }
+                else
+                {
+                    livros->status->sigla = 'L';
+                }
+            }
+            else
+            {
+                printf("\n\nDevido ao atraso, o portador do RA \033[0;36m%s\033[0m sera multado em R$%.2f.", livros->status->RA, 3 * comparar_dia(data_hoje, data_dev));
+
+                if (tolower((livros->status + 1)->sigla) == tolower('R'))
+                {
+                }
+                else
+                {
+                    livros->status->sigla = 'L';
+                }
+            }
+
+            // ## VALIDAÇÕES ##
+            if ((livros->status + 0)->sigla == 'L')
+            {
+                if (alunos->emprestado > 2)
+                {
+                    printf("\n\n\033[0;31mO aluno informado ja possui o numero maximo de emprestimos!\033[0m\n\n");
+                    safe_flag = 1;
+                }
+
+                else
+                {
+                    //Primeiro status ta livre -> EMPRESTAR
+                    (livros->status + 0)->sigla = 'E';
+                    strcpy((livros->status + 0)->RA, alunos->RA);
+
+                    (livros->status + 0)->dia_ret = data_hoje.dia;
+                    (livros->status + 0)->mes_ret = data_hoje.mes;
+
+                    (livros->status + 0)->dia_dev = adicionar_dia(data_hoje, 7).dia;
+                    (livros->status + 0)->mes_dev = adicionar_dia(data_hoje, 7).mes;
+
+                    (alunos->tabela + alunos->emprestado)->reg = livros->reg;
+                    (alunos->tabela + alunos->emprestado)->sigla = 'E';
+                    alunos->emprestado++;
+                    op_flag = 1;
+                }
+            }
+            else
+            {
+                if ((livros->status + 1)->sigla == 'R')
+                {
+                    printf("\n\nO livro encontra-se \033[0;33mreservado\033[0m ate o dia %i do mes %i.\n\n", (livros->status + 1)->dia_dev, (livros->status + 1)->mes_dev);
+
+                    safe_flag = 1;
+                }
+
+                else
+                {
+                    //Não tinha nada no segundo status -> RESERVAR
+                    if (alunos->reservado == 1)
+                    {
+                        printf("\n\n\033[0;31mO aluno ja possui o numero maximo de reservas!\033[0m\n\n");
+                        safe_flag = 1;
+                    }
+                    else
+                    {
+                        /*
+                        (livros->status + 1)->sigla = 'R';
+                        strcpy((livros->status + 1)->RA, alunos->RA);
+
+                        data_res.dia = (livros->status + 0)->dia_dev;
+                        data_res.mes = (livros->status + 0)->mes_dev;
+                        data_res = adicionar_dia(data_res, 1);
+
+                        (livros->status + 1)->dia_ret = data_res.dia;
+                        (livros->status + 1)->mes_ret = data_res.mes;
+
+                        (livros->status + 1)->dia_dev = adicionar_dia(data_res, 7).dia;
+                        (livros->status + 1)->mes_dev = adicionar_dia(data_res, 7).mes;
+
+                        (alunos->tabela + 3)->reg = livros->reg;
+                        (alunos->tabela + 3)->sigla = 'R';
+                        alunos->reservado++;
+                        op_flag = 2;
+                        */
                     }
                 }
             }
@@ -526,6 +695,20 @@ void consulta_parcial(aluno *p, int qtd)
     }
     fclose(fl);
     pause();
+}
+
+int busca_aluno_auto(livro *livros, aluno *alunos, int qtd_a)
+{
+    FILE *fl = NULL;
+
+    if ((fl = fopen("aluno.bin", "rb")) == NULL)
+    {
+        printf("Nao existem alunos no cadastro!\n\n");
+        return -1;
+    }
+    else
+    {
+    }
 }
 
 /*
@@ -857,6 +1040,51 @@ void consulta_livro(livro *livros, int qtd)
 } //fim do consulta_livro
 
 /*
+
+*/
+int busca_livro_ra(livro *livros, int qtd, aluno *alunos)
+{
+    FILE *fptr = NULL;
+    int i, achou = 0;
+    char titulo[80];
+
+    if ((fptr = fopen("livros.bin", "rb")) == NULL)
+    {
+        printf("\n\nNao ha arquivo de livros!\n\n");
+        pause();
+        return -1;
+    }
+    else
+    {
+        printf("\n\nDigite o titulo desejado: ");
+        fgets(titulo, 80, stdin);
+        flush();
+        *(titulo + strlen(titulo) - 1) = '\0';
+
+        for (i = 0; i < qtd; i++)
+        {
+            fseek(fptr, i * sizeof(livro), 0);
+            fread(livros, sizeof(livro), 1, fptr);
+
+            if (compara_string(titulo, livros->titulo) == 0 && strcmp(livros->status->RA, alunos->RA) == 0 && tolower(livros->status->sigla) == tolower('E'))
+            {
+                printf("\n\nRegistro de livro: %i\n\nTitulo: %s\nAutor: %s\n\n", livros->reg, livros->titulo, livros->autor);
+                status_livro(livros->status);
+                achou = 1;
+                break;
+            }
+        }
+
+        if (achou == 0)
+            return -1;
+        else
+            return i;
+    }
+    fclose(fptr);
+    pause();
+}
+
+/*
 Busca determinado livro pelo titulo e armazena no ponteiro fornecido
 */
 int busca_livro(livro *livros, int qtd)
@@ -1043,6 +1271,125 @@ data adicionar_dia(data data_inicial, int quantos_dias)
     }
 
     return data_aux;
+}
+
+/*
+Retorna a quantia de dias que a data principal está a frente da data comp.
+*/
+int comparar_dia(data data_principal, data data_comp)
+{
+    int dias = 0;
+
+    while (data_comp.dia != data_principal.dia || data_comp.mes != data_principal.mes)
+    {
+        data_comp.dia += 1;
+        dias++;
+
+        if (data_comp.dia > 31 && (data_comp.mes == 1 || data_comp.mes == 3 || data_comp.mes == 5 || data_comp.mes == 7 || data_comp.mes == 8 || data_comp.mes == 10 || data_comp.mes == 12))
+        {
+            if (data_comp.mes == 12)
+            {
+                data_comp.dia = 1;
+                data_comp.mes = 1;
+            }
+            else
+            {
+                data_comp.dia = 1;
+                data_comp.mes += 1;
+            }
+        }
+        else if (data_comp.dia > 30 && (data_comp.mes == 4 || data_comp.mes == 6 || data_comp.mes == 9 || data_comp.mes == 11))
+        {
+            data_comp.dia = 1;
+            data_comp.mes += 1;
+        }
+        else if (data_comp.dia > 28 && data_comp.mes == 2)
+        {
+            data_comp.dia = 1;
+            data_comp.mes += 1;
+        }
+    }
+
+    return dias;
+}
+
+/*
+Compara a diferença de dias entre a data inicial e final. Ela retorna a menor diferença que houver, portanto a diferença máxima é de meio ano.
+*/
+int comparar_dia_abs(data data_inicial, data data_final)
+{
+    int dias_mais = 0, dias_menos = 0, achou = 1;
+
+    data data_aux = data_inicial;
+
+    while (achou == 1)
+    {
+        data_inicial.dia += 1;
+        dias_mais++;
+
+        data_aux.dia -= 1;
+        dias_menos--;
+
+        if (data_inicial.dia > 31 && (data_inicial.mes == 1 || data_inicial.mes == 3 || data_inicial.mes == 5 || data_inicial.mes == 7 || data_inicial.mes == 8 || data_inicial.mes == 10 || data_inicial.mes == 12))
+        {
+            if (data_inicial.mes == 12)
+            {
+                data_inicial.dia = 1;
+                data_inicial.mes = 1;
+            }
+            else
+            {
+                data_inicial.dia = 1;
+                data_inicial.mes += 1;
+            }
+        }
+        else if (data_inicial.dia > 30 && (data_inicial.mes == 4 || data_inicial.mes == 6 || data_inicial.mes == 9 || data_inicial.mes == 11))
+        {
+            data_inicial.dia = 1;
+            data_inicial.mes += 1;
+        }
+        else if (data_inicial.dia > 28 && data_inicial.mes == 2)
+        {
+            data_inicial.dia = 1;
+            data_inicial.mes += 1;
+        } //aumenta
+
+        if (data_aux.dia < 1)
+        {
+            if (data_aux.mes == 5 || data_aux.mes == 7 || data_aux.mes == 10 || data_aux.mes == 12)
+            {
+                data_aux.mes -= 1;
+                data_aux.dia = 30;
+            }
+            else if (data_aux.mes == 2 || data_aux.mes == 4 || data_aux.mes == 6 || data_aux.mes == 8 || data_aux.mes == 9 || data_aux.mes == 11)
+            {
+                data_aux.mes -= 1;
+                data_aux.dia = 31;
+            }
+            else if (data_aux.mes == 3)
+            {
+                data_aux.mes -= 1;
+                data_aux.dia = 28;
+            }
+            else if (data_aux.mes == 1)
+            {
+                data_aux.mes = 12;
+                data_aux.dia = 31;
+            }
+        } //diminui
+
+        if (data_inicial.dia == data_final.dia && data_inicial.mes == data_final.mes)
+        {
+            achou = 0;
+            return dias_mais;
+        }
+        if (data_aux.dia == data_final.dia && data_aux.mes == data_final.mes)
+        {
+            achou = 0;
+            return dias_menos;
+        }
+
+    } //while
 }
 
 /*
