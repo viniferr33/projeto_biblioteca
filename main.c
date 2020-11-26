@@ -315,7 +315,7 @@ void empresta(data data_hoje, aluno *alunos, int qtd_a, livro *livros, int qtd_l
         if (op_flag == 1)
             printf("\n\n\033[0;32mO livro foi \033[0;31memprestado\033[0;32m com sucesso!\033[0m\n\n");
         else if (op_flag == 2)
-            printf("\n\n\033[0;32mO livro foi \033[0;33reservado\033[0;32m com sucesso!\033[0m\n\n");
+            printf("\n\n\033[0;32mO livro foi \033[0;33mreservado\033[0;32m com sucesso!\033[0m\n\n");
     }
 
     else
