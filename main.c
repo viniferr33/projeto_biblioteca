@@ -74,7 +74,7 @@ void aloca_aluno(aluno **p, int qtd);
 void cadastra_aluno(aluno *p);
 void consulta_total(aluno *p, int qtd);
 void consulta_parcial(aluno *p, int qtd);
-int busca_aluno(aluno *p, int qtd);
+int busca_aluno(aluno *p, int qtd, char *RA);
 int quantia_aluno();
 void grava_aluno(aluno *p);
 
@@ -221,13 +221,43 @@ int main(int argc, char const *argv[])
 void empresta(data data_hoje, aluno *alunos, livro *livros)
 {
     int pos_a, pos_l, qtd_a, qtd_l, safe_flag = 0, op_flag; //POSIÇÃO DO PONTEIRO DENTRO DOS ARQUIVOS, SAFE FLAG PARA EVITAR ERROS E MORTE, OPERATION FLAG INDICA QUAL FOI A OPERAÇÂO REALIZADA
-
+    char RA[7];
     data data_emp, data_res;
 
     system(clear);
 
+    printf("Digite o RA do aluno:\t");
+        int aux_ra = 0;
+        do
+        {
+            fgets(RA, 7, stdin);
+            flush();
+
+            if (strlen(RA) == 6)
+            {
+                int j;
+                for (j = 0; j < 6; j++)
+                {
+                    if (isdigit(*(RA + j)) == 0)
+                    {
+                        printf("\nO RA deve ser composto por digitos numericos!\nDigite o RA do aluno: ");
+                        aux_ra = 0;
+                        break;
+                    }
+                    else
+                        aux_ra = 1;
+                }
+            }
+
+            else
+            {
+                printf("\nO RA deve conter 6 digitos!\nDigite o RA do aluno: ");
+            }
+
+        } while (aux_ra == 0);
+
     qtd_a = quantia_aluno();
-    pos_a = busca_aluno(alunos, qtd_a);
+    pos_a = busca_aluno(alunos, qtd_a, RA);
 
     if (pos_a == -1)
     {
@@ -342,11 +372,12 @@ void devolve(data data_hoje, aluno *alunos, livro *livros)
 {
     int pos_a, pos_l, qtd_a, qtd_l, safe_flag = 0, op_flag = 0;
     data data_dev;
-
+    char RA[7];
+    
     system(clear);
 
     qtd_a = quantia_aluno();
-    pos_a = busca_aluno(alunos, qtd_a);
+    pos_a = busca_aluno(alunos, qtd_a, RA);
 
     if (pos_a == -1)
     {
@@ -715,7 +746,7 @@ int busca_aluno_auto(livro *livros, aluno *alunos, int qtd_a)
 Busca Aluno - Função da Struct Aluno
   - Busca um determinado aluno pelo RA no arquivo 'aluno.bin' e retorna sua posição
 */
-int busca_aluno(aluno *p, int qtd)
+int busca_aluno(aluno *p, int qtd, char *RA)
 {
     FILE *fl = NULL;
     system(clear);
@@ -728,37 +759,6 @@ int busca_aluno(aluno *p, int qtd)
 
     else
     {
-        printf("Digite o RA do aluno:\t");
-        int aux_ra = 0;
-        char RA[7];
-        do
-        {
-            fgets(RA, 7, stdin);
-            flush();
-
-            if (strlen(RA) == 6)
-            {
-                int j;
-                for (j = 0; j < 6; j++)
-                {
-                    if (isdigit(*(RA + j)) == 0)
-                    {
-                        printf("\nO RA deve ser composto por digitos numericos!\nDigite o RA do aluno: ");
-                        aux_ra = 0;
-                        break;
-                    }
-                    else
-                        aux_ra = 1;
-                }
-            }
-
-            else
-            {
-                printf("\nO RA deve conter 6 digitos!\nDigite o RA do aluno: ");
-            }
-
-        } while (aux_ra == 0);
-
         int i;
         int flag = 0;
         for (i = 0; i < qtd; i++)
@@ -779,12 +779,15 @@ int busca_aluno(aluno *p, int qtd)
                     if ((p->tabela + j)->sigla == 'E')
                         printf("\n\t- Reg: \033[0;36m%i\033[0;0m", (p->tabela + j)->reg);
                     else if ((p->tabela + j)->sigla == 'R')
-                        regis = (p->tabela + j)->reg;
+                        regis = 1;
                 }
 
                 printf("\nLivros reservados: \t\033[0;36m%i\033[0;0m", p->reservado);
                 if (regis > 0)
-                    printf("\n\t- Reg: \033[0;36m%i\033[0;0m", regis);
+                {
+                    printf("\n\t- Reg: \033[0;36m%i\033[0;0m", (p->tabela + 3)->reg);
+                    regis = 0;
+                }
                 printf("\n\n");
                 flag = 1;
                 return i;
