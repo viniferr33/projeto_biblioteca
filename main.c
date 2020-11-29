@@ -71,9 +71,9 @@ Funções relacionadas a manipulação da struct "Aluno"
 */
 //
 void aloca_aluno(aluno **p, int qtd);
-void cadastra_aluno(aluno *p);
+void cadastra_aluno(aluno *p, int qtd);
 void consulta_total(aluno *p, int qtd);
-void consulta_parcial(aluno *p, int qtd);
+void consulta_parcial(aluno *p, int qtd, char *RA);
 int busca_aluno(aluno *p, int qtd, char *RA);
 int quantia_aluno();
 void grava_aluno(aluno *p);
@@ -151,7 +151,8 @@ int main(int argc, char const *argv[])
                     break;
 
                 case '1':
-                    cadastra_aluno(alunos);
+                    qtd_a = quantia_aluno();
+                    cadastra_aluno(alunos, qtd_a);
                     qtd_a++;
                     break;
 
@@ -162,7 +163,38 @@ int main(int argc, char const *argv[])
 
                 case '3':
                     qtd_a = quantia_aluno();
-                    consulta_parcial(alunos, qtd_a);
+                    system(clear);
+                    printf("Digite o RA do aluno:\t");
+                    int aux_ra = 0;
+                    char RA[7];
+                    do
+                    {
+                        fgets(RA, 7, stdin);
+                        flush();
+
+                        if (strlen(RA) == 6)
+                        {
+                            int j;
+                            for (j = 0; j < 6; j++)
+                            {
+                                if (isdigit(*(RA + j)) == 0)
+                                {
+                                    printf("\nO RA deve ser composto por digitos numericos!\nDigite o RA do aluno: ");
+                                    aux_ra = 0;
+                                    break;
+                                }
+                                else
+                                    aux_ra = 1;
+                            }
+                        }
+
+                        else
+                        {
+                            printf("\nO RA deve conter 6 digitos!\nDigite o RA do aluno: ");
+                        }
+
+                    } while (aux_ra == 0);
+                    consulta_parcial(alunos, qtd_a, RA);
                     break;
 
                 default:
@@ -607,7 +639,7 @@ void aloca_aluno(aluno **p, int qtd)
 Cadastra Aluno - Função da Struct Aluno
  - Cadastra um novo aluno na lista de alunos
 */
-void cadastra_aluno(aluno *p)
+void cadastra_aluno(aluno *p, int qtd)
 {
     system(clear);
     printf("### Cadastro de alunos ###\n\n");
@@ -619,17 +651,18 @@ void cadastra_aluno(aluno *p)
 
     printf("\nDigite o RA do aluno:\t");
     int aux_ra = 0;
+    char RA[7];
     do
     {
-        fgets(p->RA, 7, stdin);
+        fgets(RA, 7, stdin);
         flush();
 
-        if (strlen(p->RA) == 6)
+        if (strlen(RA) == 6)
         {
             int j;
             for (j = 0; j < 6; j++)
             {
-                if (isdigit(*(p->RA + j)) == 0)
+                if (isdigit(*(RA + j)) == 0)
                 {
                     printf("\nO RA deve ser composto por digitos numericos!\nDigite o RA do aluno: ");
                     aux_ra = 0;
@@ -647,21 +680,31 @@ void cadastra_aluno(aluno *p)
 
     } while (aux_ra == 0);
 
-    p->emprestado = 0;
-    p->reservado = 0;
-
-    int i;
-    for (i = 0; i < 4; i++)
+    if (busca_aluno(p, qtd, RA) != -1)
     {
-        (p->tabela + i)->sigla = 'L';
+        printf("\n\nO aluno informado já esta cadastrado no sistema!\n\n");
+        pause();
     }
-    system(clear);
-    printf("\033[0;32m### Cadastro Realizado com sucesso!! ###\033[0m\n\n");
-    printf("Nome:\t\033[0;36m%s\033[0;0m\t", p->nome);
-    printf("RA: \t\033[0;36m%s\033[0;0m\n\n", p->RA);
 
-    grava_aluno(p);
-    pause();
+    else
+    {
+        strcpy(p->RA, RA);
+        p->emprestado = 0;
+        p->reservado = 0;
+
+        int i;
+        for (i = 0; i < 4; i++)
+        {
+            (p->tabela + i)->sigla = 'L';
+        }
+        system(clear);
+        printf("\033[0;32m### Cadastro Realizado com sucesso!! ###\033[0m\n\n");
+        printf("Nome:\t\033[0;36m%s\033[0;0m\t", p->nome);
+        printf("RA: \t\033[0;36m%s\033[0;0m\n\n", p->RA);
+
+        grava_aluno(p);
+        pause();
+    }
 }
 
 /*
@@ -712,7 +755,7 @@ void consulta_total(aluno *p, int qtd)
 Consulta Parcial - Função da Struct Aluno
  - Busca e imprime determinado RA na lista de alunos.
 */
-void consulta_parcial(aluno *p, int qtd)
+void consulta_parcial(aluno *p, int qtd, char *RA)
 {
     FILE *fl = NULL;
     system(clear);
@@ -722,37 +765,6 @@ void consulta_parcial(aluno *p, int qtd)
 
     else
     {
-        printf("Digite o RA do aluno:\t");
-        int aux_ra = 0;
-        char RA[7];
-        do
-        {
-            fgets(RA, 7, stdin);
-            flush();
-
-            if (strlen(RA) == 6)
-            {
-                int j;
-                for (j = 0; j < 6; j++)
-                {
-                    if (isdigit(*(RA + j)) == 0)
-                    {
-                        printf("\nO RA deve ser composto por digitos numericos!\nDigite o RA do aluno: ");
-                        aux_ra = 0;
-                        break;
-                    }
-                    else
-                        aux_ra = 1;
-                }
-            }
-
-            else
-            {
-                printf("\nO RA deve conter 6 digitos!\nDigite o RA do aluno: ");
-            }
-
-        } while (aux_ra == 0);
-
         int i;
         int flag = 0;
         for (i = 0; i < qtd; i++)
