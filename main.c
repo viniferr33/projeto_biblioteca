@@ -715,7 +715,7 @@ void consulta_total(aluno *p, int qtd)
 {
 
     FILE *fl = NULL;
-    int i, j, regis = -1;
+    int i, j, res, regis = -1;
     system(clear);
 
     if ((fl = fopen("aluno.bin", "rb")) == NULL)
@@ -737,12 +737,15 @@ void consulta_total(aluno *p, int qtd)
                 if ((p->tabela + j)->sigla == 'E')
                     printf("\n\t- Reg: \033[0;36m%i\033[0;0m - Sigla: \033[0;31m%c\033[0;0m", (p->tabela + j)->reg, (p->tabela + j)->sigla);
                 else if ((p->tabela + j)->sigla == 'R')
+                {
+                    res = j;
                     regis = 1;
+                }
             }
 
             printf("\nLivros \033[0;33mreservados\033[0;0m: \t\033[0;36m%i\033[0;0m", p->reservado);
             if (regis > 0)
-                printf("\n\t- Reg: \033[0;36m%i\033[0;0m - Sigla: \033[0;33m%c\033[0;0m", (p->tabela + 3)->reg, (p->tabela + 3)->sigla);
+                printf("\n\t- Reg: \033[0;36m%i\033[0;0m - Sigla: \033[0;33m%c\033[0;0m", (p->tabela + res)->reg, (p->tabela + res)->sigla);
             regis = 0;
             printf("\n\n");
         }
@@ -765,7 +768,7 @@ void consulta_parcial(aluno *p, int qtd, char *RA)
 
     else
     {
-        int i;
+        int i, res;
         int flag = 0;
         for (i = 0; i < qtd; i++)
         {
@@ -785,12 +788,15 @@ void consulta_parcial(aluno *p, int qtd, char *RA)
                     if ((p->tabela + j)->sigla == 'E')
                         printf("\n\t- Reg: \033[0;36m%i\033[0;0m - Sigla: \033[0;31m%c\033[0;0m", (p->tabela + j)->reg, (p->tabela + j)->sigla);
                     else if ((p->tabela + j)->sigla == 'R')
+                    {
+                        res = j;
                         regis = 1;
+                    }
                 }
 
                 printf("\nLivros \033[0;33mreservados\033[0;0m: \t\033[0;36m%i\033[0;0m", p->reservado);
                 if (regis > 0)
-                    printf("\n\t- Reg: \033[0;36m%i\033[0;0m - Sigla: \033[0;33m%c\033[0;0m", (p->tabela + 3)->reg, (p->tabela + 3)->sigla);
+                    printf("\n\t- Reg: \033[0;36m%i\033[0;0m - Sigla: \033[0;33m%c\033[0;0m", (p->tabela + res)->reg, (p->tabela + res)->sigla);
                 printf("\n\n");
                 flag = 1;
                 break;
@@ -820,7 +826,7 @@ int busca_aluno(aluno *p, int qtd, char *RA)
 
     else
     {
-        int i;
+        int i, res;
         int flag = 0;
         for (i = 0; i < qtd; i++)
         {
@@ -840,13 +846,16 @@ int busca_aluno(aluno *p, int qtd, char *RA)
                     if ((p->tabela + j)->sigla == 'E')
                         printf("\n\t- Reg: \033[0;36m%i\033[0;0m", (p->tabela + j)->reg);
                     else if ((p->tabela + j)->sigla == 'R')
+                    {
+                        res = j;
                         regis = 1;
+                    }
                 }
 
                 printf("\nLivros reservados: \t\033[0;36m%i\033[0;0m", p->reservado);
                 if (regis > 0)
                 {
-                    printf("\n\t- Reg: \033[0;36m%i\033[0;0m", (p->tabela + 3)->reg);
+                    printf("\n\t- Reg: \033[0;36m%i\033[0;0m", (p->tabela + res)->reg);
                     regis = 0;
                 }
                 printf("\n\n");
