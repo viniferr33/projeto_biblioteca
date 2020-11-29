@@ -342,8 +342,8 @@ void empresta(data data_hoje, aluno *alunos, livro *livros)
                     (livros->status + 0)->dia_dev = adicionar_dia(data_hoje, 7).dia;
                     (livros->status + 0)->mes_dev = adicionar_dia(data_hoje, 7).mes;
 
-                    (alunos->tabela + alunos->emprestado)->reg = livros->reg;
-                    (alunos->tabela + alunos->emprestado)->sigla = 'E';
+                    (alunos->tabela + alunos->emprestado + alunos->reservado)->reg = livros->reg;
+                    (alunos->tabela + alunos->emprestado + alunos->reservado)->sigla = 'E';
                     alunos->emprestado++;
                     op_flag = 1;
                 }
@@ -380,8 +380,8 @@ void empresta(data data_hoje, aluno *alunos, livro *livros)
                         (livros->status + 1)->dia_dev = adicionar_dia(data_res, 7).dia;
                         (livros->status + 1)->mes_dev = adicionar_dia(data_res, 7).mes;
 
-                        (alunos->tabela + 3)->reg = livros->reg;
-                        (alunos->tabela + 3)->sigla = 'R';
+                        (alunos->tabela + alunos->emprestado + alunos->reservado)->reg = livros->reg;
+                        (alunos->tabela + alunos->emprestado + alunos->reservado)->sigla = 'R';
                         alunos->reservado++;
                         op_flag = 2;
                     }
