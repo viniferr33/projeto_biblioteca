@@ -653,8 +653,8 @@ void devolve(livro *livros, aluno *alunos, data data_hoje)
 
             } //-há multa
 
-            //busca_aluno(alunos, qtd_a, RA);
-            consulta_parcial(alunos, qtd_a, RA);
+            busca_aluno(alunos, qtd_a, RA);
+            //consulta_parcial(alunos, qtd_a, RA);
 
             printf("\n\nRegistro de livro: \033[0;36m%i\033[0m\n\nTitulo: \033[0;36m%s\033[0m\nAutor: \033[0;36m%s\033[0m\n\n", livros->reg, livros->titulo, livros->autor);
             status_livro(livros->status);
@@ -707,17 +707,18 @@ Cadastra Aluno - Função da Struct Aluno
 */
 void cadastra_aluno(aluno *p, int qtd)
 {
+    int aux_ra = 0;
+    char RA[7], nome[80];
+    
     system(clear);
     printf("### \033[0;35mCADASTRAR ALUNO\033[0m ###\n\n");
 
     printf("Digite o nome do aluno:\t");
-    fgets(p->nome, 79, stdin);
+    fgets(nome, 79, stdin);
     flush();
-    *(p->nome + strlen(p->nome) - 1) = '\0';
+    *(nome + strlen(nome) - 1) = '\0';
 
     printf("\nDigite o RA do aluno:\t");
-    int aux_ra = 0;
-    char RA[7];
     do
     {
         fgets(RA, 7, stdin);
@@ -754,6 +755,7 @@ void cadastra_aluno(aluno *p, int qtd)
 
     else
     {
+        strcpy(p->nome, nome);
         strcpy(p->RA, RA);
         p->emprestado = 0;
         p->reservado = 0;
@@ -889,7 +891,7 @@ int busca_aluno(aluno *p, int qtd, char *RA)
     if ((fl = fopen("aluno.bin", "rb")) == NULL)
     {
         printf("Nao existem alunos no cadastro!\n\n");
-        pause();
+        fclose(fl);
         return -1;
     }
 
@@ -929,13 +931,16 @@ int busca_aluno(aluno *p, int qtd, char *RA)
                 }
                 printf("\n\n");
                 flag = 1;
+                fclose(fl);
                 return i;
             }
         }
         if (flag == 0)
+        {
+            fclose(fl);
             return -1;
+        }
     }
-    fclose(fl);
 }
 
 /*
@@ -1243,8 +1248,7 @@ int busca_livro(livro *livros, int qtd)
 
     if ((fptr = fopen("livros.bin", "rb")) == NULL)
     {
-        printf("\n\nNao ha arquivo de livros!\n\n");
-        pause();
+        fclose(fptr);
         return -1;
     }
     else
@@ -1267,14 +1271,12 @@ int busca_livro(livro *livros, int qtd)
                 break;
             }
         }
-
+        fclose(fptr);
         if (achou == 0)
             return -1;
         else
             return i;
     }
-    fclose(fptr);
-    pause();
 }
 
 /*
