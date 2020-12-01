@@ -592,8 +592,7 @@ void devolve(livro *livros, aluno *alunos, data data_hoje)
             } //-há multa
 
             busca_aluno(alunos, qtd_a, RA);
-            //consulta_parcial(alunos, qtd_a);
-            printf("\no livro foi devolvido e os caralho ainda tem q esperar arrumar a funcao de mostra isso");
+            consulta_parcial(alunos, qtd_a, RA);
 
             printf("\n\nRegistro de livro: \033[0;36m%i\033[0m\n\nTitulo: \033[0;36m%s\033[0m\nAutor: \033[0;36m%s\033[0m\n\n", livros->reg, livros->titulo, livros->autor);
             status_livro(livros->status);
@@ -612,9 +611,6 @@ void devolve(livro *livros, aluno *alunos, data data_hoje)
                 printf("\nO livro estava \033[0;033mreservado\033[0m para o RA \033[0;36m%s\033[0m, mas devido ao atraso esta reserva foi cancelada.\n\n", (livros->status + 1)->RA);
             }
 
-            pause();
-
-            printf("\n\n\nRA = %s\nalunos->RA = %s\nlivros->status->RA = %s\nqtd_a = %i\npos_a = %i\nqtd_l = %i\npos_l = %i\ndifereca dias = %i\n", RA, alunos->RA, livros->status->RA, qtd_a, pos_a, qtd_l, pos_l, dias_dif);
             pause();
         } //-livro existe
 
