@@ -109,11 +109,13 @@ int main(int argc, char const *argv[])
     data data_hoje, data_aux;
     obter_data(&data_hoje);
 
-    //obter_data(&data_aux);
+    /*
+    obter_data(&data_aux);
 
-    //dias_aux = comparar_dia(data_hoje, data_aux);
-    //printf("\n\nDias de diferenca: %i\n\n", dias_aux);
-    //pause();
+    dias_aux = comparar_dia(data_hoje, data_aux);
+    printf("\n\nDias de diferenca: %i\n\n", dias_aux);
+    pause();
+    */
 
     char opt = '\0';
     char op = '\0';
@@ -130,7 +132,7 @@ int main(int argc, char const *argv[])
     {
         system(clear);
 
-        printf("Ola, essa e a \033[0;35mBIBLIOTECA\033[0m\nDia: %i\tMes: %i\n\nOpcoes:\n[1] - Cadastro e consulta de alunos\n[2] - Cadastro e consulta de livros\n[3] - Fazer emprestimo\n[4] - Receber devolucao\n[0] - Sair", data_hoje.dia, data_hoje.mes);
+        printf("Ola, essa e a \033[0;35mBIBLIOTECA\033[0m\nDia: %i\tMes: %i\n\nOpcoes:\n[1] - Cadastro e consulta de alunos\n[2] - Cadastro e consulta de livros\n[3] - Fazer emprestimo\n[4] - Receber devolucao\n[9] - Alterar a data\n[0] - Sair", data_hoje.dia, data_hoje.mes);
         opt = retorna_char();
 
         switch (opt)
@@ -142,7 +144,7 @@ int main(int argc, char const *argv[])
             do
             {
                 system(clear);
-                printf("ALUNOS\n\n[1] - Adicionar\n[2] - Pesquisa total\n[3] - Pesquisa Parcial\n[0] - Sair");
+                printf("### \033[0;35mALUNOS\033[0m ###\n\n[1] - Adicionar\n[2] - Pesquisa total\n[3] - Pesquisa Parcial\n[0] - Sair");
                 op = retorna_char();
 
                 switch (op)
@@ -164,7 +166,7 @@ int main(int argc, char const *argv[])
                 case '3':
                     qtd_a = quantia_aluno();
                     system(clear);
-                    printf("Digite o RA do aluno:\t");
+                    printf("Digite o RA do aluno: ");
                     int aux_ra = 0;
                     char RA[7];
                     do
@@ -209,7 +211,7 @@ int main(int argc, char const *argv[])
             do
             {
                 system(clear);
-                printf("LIVROS\n\n[1] - Cadastrar livros\n[2] - Consultar livros\n[0] - Sair");
+                printf("### \033[0;35mLIVROS\033[0m ###\n\n[1] - Cadastrar livros\n[2] - Consultar livros\n[0] - Sair");
 
                 op = retorna_char();
 
@@ -244,6 +246,10 @@ int main(int argc, char const *argv[])
             devolve(livros, alunos, data_hoje);
             break;
 
+        case '9':
+            obter_data(&data_hoje);
+            break;
+
         default:
             printf("\n\n\033[0;31mDigite uma opcao valida.\033[0m\n\n");
             pause();
@@ -265,7 +271,7 @@ void empresta(data data_hoje, aluno *alunos, livro *livros)
 
     system(clear);
 
-    printf("Digite o RA do aluno:\t");
+    printf("### \033[0;35mEMPRESTIMO DE LIVRO\033[0m ###\n\nDigite o RA do aluno: ");
     int aux_ra = 0;
     do
     {
@@ -300,12 +306,12 @@ void empresta(data data_hoje, aluno *alunos, livro *livros)
 
     if (pos_a == -1)
     {
-        printf("\n\n\033[0;31mO aluno informado nao foi encontrado no sistema! Verifique se o mesmo foi cadastrado anteriormente!\033[0m\n\n");
+        printf("\n\033[0;31mO aluno informado nao foi encontrado no sistema! Verifique se o mesmo foi cadastrado anteriormente!\033[0m\n\n");
         safe_flag = 1;
     }
     else if (alunos->emprestado > 3 && alunos->reservado == 1)
     {
-        printf("\n\n\033[0;31mO aluno informado ja possui o numero maximo de emprestimos e reservas!\033[0m\n\n");
+        printf("\n\033[0;31mO aluno informado ja possui o numero maximo de emprestimos e reservas!\033[0m\n\n");
         safe_flag = 1;
     }
 
@@ -316,7 +322,7 @@ void empresta(data data_hoje, aluno *alunos, livro *livros)
 
         if (pos_l == -1)
         {
-            printf("\n\n\033[0;31mO livro informado nao foi encontrado no sistema! Verifique se o mesmo foi cadastrado anteriormente!\033[0m\n\n");
+            printf("\n\033[0;31mO livro informado nao foi encontrado no sistema! Verifique se o mesmo foi cadastrado anteriormente!\033[0m\n\n");
             safe_flag = 1;
         }
         else
@@ -326,7 +332,7 @@ void empresta(data data_hoje, aluno *alunos, livro *livros)
             {
                 if (alunos->emprestado > 2)
                 {
-                    printf("\n\n\033[0;31mO aluno informado ja possui o numero maximo de emprestimos!\033[0m\n\n");
+                    printf("\n\033[0;31mO aluno informado ja possui o numero maximo de emprestimos!\033[0m\n\n");
                     safe_flag = 1;
                 }
 
@@ -352,7 +358,7 @@ void empresta(data data_hoje, aluno *alunos, livro *livros)
             {
                 if ((livros->status + 1)->sigla == 'R')
                 {
-                    printf("\n\nO livro encontra-se \033[0;33mreservado\033[0m ate o dia %i do mes %i.\n\n", (livros->status + 1)->dia_dev, (livros->status + 1)->mes_dev);
+                    printf("\nO livro encontra-se \033[0;33mreservado\033[0m ate o dia %i do mes %i.\n\n", (livros->status + 1)->dia_dev, (livros->status + 1)->mes_dev);
 
                     safe_flag = 1;
                 }
@@ -362,7 +368,7 @@ void empresta(data data_hoje, aluno *alunos, livro *livros)
                     //Não tinha nada no segundo status -> RESERVAR
                     if (alunos->reservado == 1)
                     {
-                        printf("\n\n\033[0;31mO aluno ja possui o numero maximo de reservas!\033[0m\n\n");
+                        printf("\n\033[0;31mO aluno ja possui o numero maximo de reservas!\033[0m\n\n");
                         safe_flag = 1;
                     }
                     else
@@ -393,10 +399,21 @@ void empresta(data data_hoje, aluno *alunos, livro *livros)
     if (safe_flag == 0)
     {
         modifica(alunos, pos_a, livros, pos_l);
+
+        busca_aluno(alunos, qtd_a, RA);
+
+        printf("Registro de livro: \033[0;36m%i\033[0m\n\nTitulo: \033[0;36m%s\033[0m\nAutor: \033[0;36m%s\033[0m\n\n", livros->reg, livros->titulo, livros->autor);
+        status_livro(livros->status);
+        printf("\n\n");
+
         if (op_flag == 1)
-            printf("\n\n\033[0;32mO livro foi \033[0;31memprestado\033[0;32m com sucesso!\033[0m\n\n");
+        {
+            printf("\n\033[0;32mO livro foi \033[0;31memprestado\033[0;32m com sucesso!\033[0m\n\n");
+        }
         else if (op_flag == 2)
-            printf("\n\n\033[0;32mO livro foi \033[0;33mreservado\033[0;32m com sucesso!\033[0m\n\n");
+        {
+            printf("\n\033[0;32mO livro foi \033[0;33mreservado\033[0;32m com sucesso!\033[0m\n\n");
+        }
     }
 
     else
@@ -417,7 +434,7 @@ void devolve(livro *livros, aluno *alunos, data data_hoje)
     data data_dev;
 
     system(clear);
-    printf("Digite o RA do aluno: ");
+    printf("### \033[0;35mDEVOLUCAO DE LIVRO\033[0m ###\n\nDigite o RA do aluno: ");
     int aux_ra = 0;
     do
     {
@@ -452,7 +469,7 @@ void devolve(livro *livros, aluno *alunos, data data_hoje)
 
     if (pos_a == -1)
     {
-        printf("\033[0;31mO aluno informado nao existe.\033[0m\n\n");
+        printf("\n\033[0;31mO aluno informado nao existe.\033[0m\n\n");
         pause();
     }
     else
@@ -539,38 +556,83 @@ void devolve(livro *livros, aluno *alunos, data data_hoje)
             {
                 if ((livros->status + 1)->sigla == 'R')
                 {
-                    livros->status->sigla = 'L';
-                    (livros->status + 1)->sigla = 'L';
-
-                    for (i = 0; i < 4; i++)
+                    if (dias_dif > 0)
                     {
-                        if ((alunos->tabela + i)->reg == livros->reg)
+                        livros->status->sigla = 'L';
+                        (livros->status + 1)->sigla = 'L';
+
+                        for (i = 0; i < 4; i++)
                         {
-                            (alunos->tabela + i)->sigla = 'L';
-                            (alunos->tabela + i)->reg = -1;
-                            alunos->emprestado -= 1;
-                            break;
+                            if ((alunos->tabela + i)->reg == livros->reg)
+                            {
+                                (alunos->tabela + i)->sigla = 'L';
+                                (alunos->tabela + i)->reg = -1;
+                                alunos->emprestado -= 1;
+                                break;
+                            }
                         }
-                    }
 
-                    modifica(alunos, pos_a, livros, pos_l);
+                        modifica(alunos, pos_a, livros, pos_l);
 
-                    pos_a = busca_aluno(alunos, qtd_a, (livros->status + 1)->RA);
+                        pos_a = busca_aluno(alunos, qtd_a, (livros->status + 1)->RA);
 
-                    for (i = 0; i < 4; i++)
+                        for (i = 0; i < 4; i++)
+                        {
+                            if ((alunos->tabela + i)->reg == livros->reg)
+                            {
+                                (alunos->tabela + i)->sigla = 'L';
+                                alunos->reservado = 0;
+                                break;
+                            }
+                        }
+
+                        modifica(alunos, pos_a, livros, pos_l);
+
+                        res_flag = -1;
+                    } //com reserva e multa
+                    else
                     {
-                        if ((alunos->tabela + i)->reg == livros->reg)
+                        (livros->status + 1)->sigla = 'L';
+
+                        for (i = 0; i < 4; i++)
                         {
-                            (alunos->tabela + i)->sigla = 'L';
-                            alunos->reservado = 0;
-                            break;
+                            if ((alunos->tabela + i)->reg == livros->reg)
+                            {
+                                (alunos->tabela + i)->sigla = 'L';
+                                alunos->emprestado -= 1;
+                                break;
+                            }
                         }
-                    }
 
-                    modifica(alunos, pos_a, livros, pos_l);
+                        modifica(alunos, pos_a, livros, pos_l);
 
-                    res_flag = -1;
-                } //com reserva
+                        livros->status->sigla = 'E';
+                        strcpy(livros->status->RA, (livros->status + 1)->RA);
+
+                        livros->status->dia_dev = (livros->status + 1)->dia_dev;
+                        livros->status->mes_dev = (livros->status + 1)->mes_dev;
+
+                        livros->status->dia_ret = (livros->status + 1)->dia_ret;
+                        livros->status->mes_ret = (livros->status + 1)->mes_ret;
+
+                        pos_a = busca_aluno(alunos, qtd_a, livros->status->RA);
+
+                        for (i = 0; i < 4; i++)
+                        {
+                            if ((alunos->tabela + i)->reg == livros->reg)
+                            {
+                                (alunos->tabela + i)->sigla = 'E';
+                                alunos->emprestado += 1;
+                                alunos->reservado -= 1;
+                                break;
+                            }
+                        }
+
+                        modifica(alunos, pos_a, livros, pos_l);
+
+                        res_flag = 2;
+                    } //com reserva e adiantado
+                }
                 else
                 {
                     livros->status->sigla = 'L';
@@ -587,11 +649,11 @@ void devolve(livro *livros, aluno *alunos, data data_hoje)
                     }
 
                     modifica(alunos, pos_a, livros, pos_l);
-                } //sem reserva
+                } //sem reserva com multa
 
             } //-há multa
 
-            busca_aluno(alunos, qtd_a, RA);
+            //busca_aluno(alunos, qtd_a, RA);
             consulta_parcial(alunos, qtd_a, RA);
 
             printf("\n\nRegistro de livro: \033[0;36m%i\033[0m\n\nTitulo: \033[0;36m%s\033[0m\nAutor: \033[0;36m%s\033[0m\n\n", livros->reg, livros->titulo, livros->autor);
@@ -601,10 +663,18 @@ void devolve(livro *livros, aluno *alunos, data data_hoje)
             {
                 printf("\n\nDias atrasados: \033[0;31m%i\033[0m. O valor da multa a ser paga pelo RA \033[0;36m%s\033[0m e de R$\033[0;31m%.2f\033[0m.\n\n", dias_dif, alunos->RA, (float)dias_dif * 3);
             }
+            if (dias_dif < 0)
+            {
+                printf("\n\nDias adiantados: %i. O portador do RA \033[0;36m%s\033[0m devolveu o livro antes da data prevista.\n\n", -dias_dif, RA);
+            }
 
             if (res_flag == 1)
             {
                 printf("\n\nO livro \033[0;33mreservado\033[0m pelo RA \033[0;36m%s\033[0m agora foi \033[0;31memprestado\033[0m para esta mesma pessoa.\n\n", livros->status->RA);
+            }
+            if (res_flag == 2)
+            {
+                printf("\nO livro \033[0;33mreservado\033[0m pelo RA \033[0;36m%s\033[0m foi \033[0;31memprestado\033[0m para esta mesma pessoa, a retirada sera no dia %i do mes %i.\n\n", livros->status->RA, livros->status->dia_ret, livros->status->mes_ret);
             }
             if (res_flag == -1)
             {
@@ -638,7 +708,7 @@ Cadastra Aluno - Função da Struct Aluno
 void cadastra_aluno(aluno *p, int qtd)
 {
     system(clear);
-    printf("### Cadastro de alunos ###\n\n");
+    printf("### \033[0;35mCADASTRAR ALUNO\033[0m ###\n\n");
 
     printf("Digite o nome do aluno:\t");
     fgets(p->nome, 79, stdin);
@@ -713,6 +783,7 @@ void consulta_total(aluno *p, int qtd)
     FILE *fl = NULL;
     int i, j, res, regis = -1;
     system(clear);
+    printf("### \033[0;35mCONSULTA TOTAL DE ALUNOS\033[0m ###\n\n");
 
     if ((fl = fopen("aluno.bin", "rb")) == NULL)
         printf("Nao existem alunos no cadastro!\n\n");
@@ -758,6 +829,7 @@ void consulta_parcial(aluno *p, int qtd, char *RA)
 {
     FILE *fl = NULL;
     system(clear);
+    printf("### \033[0;35mCONSULTA PARCIAL DE ALUNOS\033[0m ###\n\n");
 
     if ((fl = fopen("aluno.bin", "rb")) == NULL)
         printf("Nao existem alunos no cadastro!\n\n");
@@ -817,6 +889,7 @@ int busca_aluno(aluno *p, int qtd, char *RA)
     if ((fl = fopen("aluno.bin", "rb")) == NULL)
     {
         printf("Nao existem alunos no cadastro!\n\n");
+        pause();
         return -1;
     }
 
@@ -863,7 +936,6 @@ int busca_aluno(aluno *p, int qtd, char *RA)
             return -1;
     }
     fclose(fl);
-    pause();
 }
 
 /*
@@ -966,7 +1038,7 @@ void cadastra_livro(livro *livros, int qtd)
 
     livros->reg = qtd;
 
-    printf("CADASTRO DE LIVROS\n\nRegistro de livro: %i", qtd);
+    printf("### \033[0;35mCADASTRAR LIVRO\033[0m ###\n\nRegistro de livro: %i", qtd);
 
     printf("\n\nInsira o titulo do livro: ");
     gets(livros->titulo);
@@ -979,6 +1051,12 @@ void cadastra_livro(livro *livros, int qtd)
     livros->status->sigla = 'L';
 
     gravar_livro(livros);
+
+    printf("\n\nRegistro de livro: \033[0;36m%i\033[0m\n\nTitulo: \033[0;36m%s\033[0m\nAutor: \033[0;36m%s\033[0m\n\n", livros->reg, livros->titulo, livros->autor);
+    status_livro(livros->status);
+
+    printf("\n\n\033[0;32mO livro foi cadastrado com sucesso.\033[0m\n\n");
+    pause();
 }
 
 /*
@@ -1019,7 +1097,7 @@ void consulta_livro(livro *livros, int qtd)
         {
             achou = 0;
             system(clear);
-            printf("CONSULTA DE LIVROS\n\n[1] - Todos os livros\n[2] - Por status\n[3] - Por titulo\n[0] - Sair");
+            printf("### \033[0;35mCONSULTA DE LIVROS\033[0m ###\n\n[1] - Todos os livros\n[2] - Por status\n[3] - Por titulo\n[0] - Sair");
 
             op = retorna_char();
 
@@ -1171,7 +1249,7 @@ int busca_livro(livro *livros, int qtd)
     }
     else
     {
-        printf("\n\nDigite o titulo desejado: ");
+        printf("\nDigite o titulo desejado: ");
         fgets(titulo, 80, stdin);
         flush();
         *(titulo + strlen(titulo) - 1) = '\0';
@@ -1346,9 +1424,45 @@ data adicionar_dia(data data_inicial, int quantos_dias)
 /*
 Retorna a quantia de dias que a data principal está a frente da data comp.
 */
-int comparar_dia(data data_principal, data data_comp)
+int comparar_dia(data data_principal, data data_sec)
 {
-    int dias = 0;
+    int i, dias = 0;
+
+    data data_comp = data_sec, data_aux = data_principal;
+
+    for (i = 0; i < 7; i++)
+    {
+        data_aux.dia += 1;
+
+        if (data_aux.dia > 31 && (data_aux.mes == 1 || data_aux.mes == 3 || data_aux.mes == 5 || data_aux.mes == 7 || data_aux.mes == 8 || data_aux.mes == 10 || data_aux.mes == 12))
+        {
+            if (data_aux.mes == 12)
+            {
+                data_aux.dia = 1;
+                data_aux.mes = 1;
+            }
+            else
+            {
+                data_aux.dia = 1;
+                data_aux.mes += 1;
+            }
+        }
+        else if (data_aux.dia > 30 && (data_aux.mes == 4 || data_aux.mes == 6 || data_aux.mes == 9 || data_aux.mes == 11))
+        {
+            data_aux.dia = 1;
+            data_aux.mes += 1;
+        }
+        else if (data_aux.dia > 28 && data_aux.mes == 2)
+        {
+            data_aux.dia = 1;
+            data_aux.mes += 1;
+        }
+
+        if (data_aux.dia == data_comp.dia && data_aux.mes == data_comp.mes)
+        {
+            return -(i + 1);
+        }
+    }
 
     while (data_comp.dia != data_principal.dia || data_comp.mes != data_principal.mes)
     {
