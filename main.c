@@ -109,14 +109,6 @@ int main(int argc, char const *argv[])
     data data_hoje, data_aux;
     obter_data(&data_hoje);
 
-    /*
-    obter_data(&data_aux);
-
-    dias_aux = comparar_dia(data_hoje, data_aux);
-    printf("\n\nDias de diferenca: %i\n\n", dias_aux);
-    pause();
-    */
-
     char opt = '\0';
     char op = '\0';
 
@@ -322,7 +314,7 @@ void empresta(data data_hoje, aluno *alunos, livro *livros)
 
         if (pos_l == -1)
         {
-            printf("\n\033[0;31mO livro informado nao foi encontrado no sistema! Verifique se o mesmo foi cadastrado anteriormente!\033[0m\n\n");
+            printf("\n\033[0;31mO arquivo de livro nao existe ou livro informado nao foi encontrado no sistema! Verifique se o mesmo foi cadastrado anteriormente!\033[0m\n\n");
             safe_flag = 1;
         }
         else
@@ -366,9 +358,13 @@ void empresta(data data_hoje, aluno *alunos, livro *livros)
                 else
                 {
                     //Não tinha nada no segundo status -> RESERVAR
-                    if (alunos->reservado == 1)
+                    if(strcmp(RA, livros->status->RA) == 0){
+                        printf("\n\n\033[0;31mO livro ja esta emprestado para este aluno!\033[0m\n\n");
+                        safe_flag = 1;
+                    }
+                    else if (alunos->reservado == 1)
                     {
-                        printf("\n\033[0;31mO aluno ja possui o numero maximo de reservas!\033[0m\n\n");
+                        printf("\n\n\033[0;31mO aluno ja possui o numero maximo de reservas!\033[0m\n\n");
                         safe_flag = 1;
                     }
                     else
@@ -654,11 +650,14 @@ void devolve(livro *livros, aluno *alunos, data data_hoje)
             } //-há multa
 
             busca_aluno(alunos, qtd_a, RA);
-            //consulta_parcial(alunos, qtd_a, RA);
 
             printf("\n\nRegistro de livro: \033[0;36m%i\033[0m\n\nTitulo: \033[0;36m%s\033[0m\nAutor: \033[0;36m%s\033[0m\n\n", livros->reg, livros->titulo, livros->autor);
             status_livro(livros->status);
 
+            if (dias_dif == 0)
+            {
+                printf("\n\n");
+            }
             if (dias_dif > 0)
             {
                 printf("\n\nDias atrasados: \033[0;31m%i\033[0m. O valor da multa a ser paga pelo RA \033[0;36m%s\033[0m e de R$\033[0;31m%.2f\033[0m.\n\n", dias_dif, alunos->RA, (float)dias_dif * 3);
@@ -709,7 +708,7 @@ void cadastra_aluno(aluno *p, int qtd)
 {
     int aux_ra = 0;
     char RA[7], nome[80];
-    
+
     system(clear);
     printf("### \033[0;35mCADASTRAR ALUNO\033[0m ###\n\n");
 
@@ -1424,7 +1423,8 @@ data adicionar_dia(data data_inicial, int quantos_dias)
 }
 
 /*
-Retorna a quantia de dias que a data principal está a frente da data comp.
+Retorna a quantia de dias que a data principal está a frente da data comp. Caso haja uma semana ou menos de diferença
+retorna a quantia de dias em um número negativo.
 */
 int comparar_dia(data data_principal, data data_sec)
 {
@@ -1497,85 +1497,6 @@ int comparar_dia(data data_principal, data data_sec)
     }
 
     return dias;
-}
-
-/*
-Compara a diferença de dias entre a data inicial e final. Ela retorna a menor diferença que houver, portanto a diferença máxima é de meio ano.
-*/
-int comparar_dia_abs(data data_inicial, data data_final)
-{
-    int dias_mais = 0, dias_menos = 0, achou = 1;
-
-    data data_aux = data_inicial;
-
-    while (achou == 1)
-    {
-        data_inicial.dia += 1;
-        dias_mais++;
-
-        data_aux.dia -= 1;
-        dias_menos--;
-
-        if (data_inicial.dia > 31 && (data_inicial.mes == 1 || data_inicial.mes == 3 || data_inicial.mes == 5 || data_inicial.mes == 7 || data_inicial.mes == 8 || data_inicial.mes == 10 || data_inicial.mes == 12))
-        {
-            if (data_inicial.mes == 12)
-            {
-                data_inicial.dia = 1;
-                data_inicial.mes = 1;
-            }
-            else
-            {
-                data_inicial.dia = 1;
-                data_inicial.mes += 1;
-            }
-        }
-        else if (data_inicial.dia > 30 && (data_inicial.mes == 4 || data_inicial.mes == 6 || data_inicial.mes == 9 || data_inicial.mes == 11))
-        {
-            data_inicial.dia = 1;
-            data_inicial.mes += 1;
-        }
-        else if (data_inicial.dia > 28 && data_inicial.mes == 2)
-        {
-            data_inicial.dia = 1;
-            data_inicial.mes += 1;
-        } //aumenta
-
-        if (data_aux.dia < 1)
-        {
-            if (data_aux.mes == 5 || data_aux.mes == 7 || data_aux.mes == 10 || data_aux.mes == 12)
-            {
-                data_aux.mes -= 1;
-                data_aux.dia = 30;
-            }
-            else if (data_aux.mes == 2 || data_aux.mes == 4 || data_aux.mes == 6 || data_aux.mes == 8 || data_aux.mes == 9 || data_aux.mes == 11)
-            {
-                data_aux.mes -= 1;
-                data_aux.dia = 31;
-            }
-            else if (data_aux.mes == 3)
-            {
-                data_aux.mes -= 1;
-                data_aux.dia = 28;
-            }
-            else if (data_aux.mes == 1)
-            {
-                data_aux.mes = 12;
-                data_aux.dia = 31;
-            }
-        } //diminui
-
-        if (data_inicial.dia == data_final.dia && data_inicial.mes == data_final.mes)
-        {
-            achou = 0;
-            return dias_mais;
-        }
-        if (data_aux.dia == data_final.dia && data_aux.mes == data_final.mes)
-        {
-            achou = 0;
-            return dias_menos;
-        }
-
-    } //while
 }
 
 /*
